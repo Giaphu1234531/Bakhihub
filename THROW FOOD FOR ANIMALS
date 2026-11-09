@@ -8,10 +8,43 @@ local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
 local LocalPlayer = Players.LocalPlayer
+local sharedEnvironment = getgenv and getgenv() or _G
 
 local WORKER_URL = "https://getkeybakhihub.giaphu23062008.workers.dev"
 local GAME_ID = "throw-food-animals"
 local KEY_PATH = "BaKhi/SavedKey.txt"
+
+-- Hàm băm HWID chuẩn chống giả mạo
+local function computeDigest(text)
+	local high = 0xcbf29ce4
+	local low = 0x84222325
+	for index = 1, #text do
+		low = bit32.bxor(low, string.byte(text, index))
+		local product = low * 435
+		high = (high * 435 + product // 4294967296 + bit32.lshift(low, 8)) % 4294967296
+		low = product % 4294967296
+	end
+	return string.format("%08x%08x", high, low)
+end
+
+local function readRawDeviceId()
+	for _, functionName in {"gethwid", "get_hwid"} do
+		local readHardwareId = sharedEnvironment[functionName]
+		if type(readHardwareId) == "function" then
+			local succeeded, hardwareId = pcall(readHardwareId)
+			if succeeded and type(hardwareId) == "string" and #hardwareId >= 16 then
+				return hardwareId
+			end
+		end
+	end
+	local clientIdRead, clientId = pcall(function() return game:GetService("RbxAnalyticsService"):GetClientId() end)
+	if clientIdRead and type(clientId) == "string" then return clientId end
+	local userIdRead, userId = pcall(function() return Players.LocalPlayer.UserId end)
+	if userIdRead and type(userId) == "number" then return "U" .. userId end
+	return "UnknownDevice"
+end
+
+local deviceDigest = computeDigest(readRawDeviceId())
 
 local function sendPostRequest(url, bodyTable)
 	local jsonBody = HttpService:JSONEncode(bodyTable)
@@ -38,7 +71,8 @@ local function validateKey(enteredKey)
 	local payload = {
 		gameId = GAME_ID,
 		placeId = tostring(game.PlaceId),
-		key = cleanKey
+		key = cleanKey,
+		hwid = deviceDigest -- Đã thêm HWID để khớp với Server Worker
 	}
 
 	local success, result = pcall(function()
@@ -47,15 +81,16 @@ local function validateKey(enteredKey)
 
 	if success and result then
 		if result.valid == true then
-			local nowMs = DateTime.now().UnixTimestampMillis
-			if result.expiresAt and result.expiresAt <= nowMs then
-				return false, "expired"
-			end
 			return true, result.expiresAt
-		elseif result.reason == "expired" or (result.message and tostring(result.message):lower():find("expire")) then
-			return false, "expired"
 		else
-			return false, "invalid"
+			local reason = tostring(result.reason or result.message or ""):lower()
+			if reason:find("expire") then
+				return false, "expired"
+			elseif reason:find("khác") or reason:find("hwid") or reason:find("máy") then
+				return false, "wrong_device"
+			else
+				return false, "invalid"
+			end
 		end
 	end
 	return false, "network_error"
@@ -1400,7 +1435,6 @@ local function loadMainScript()
 			local clientState = ClientStateModule or safeRequire(findController("ClientState"))
 			local character = LocalPlayer.Character
 
-			-- Tính năng tự gỡ kẹt nếu tắt toàn bộ Auto
 			if not configState.AutoThrow and not configState.AutoTrain and not configState.AutoRingRush then
 				if not busy.action then
 					resetMovementLock()
@@ -1760,6 +1794,10 @@ local function validateAndProceed(entered, isAuto)
 			statusLabel.Text = "This key has expired! Click GET KEY for a new one."
 			statusLabel.TextColor3 = c.er
 			submitBtn.Text = "EXPIRED"
+		elseif resultData == "wrong_device" then
+			statusLabel.Text = "Key này đăng ký cho máy khác. Tự get key đi!"
+			statusLabel.TextColor3 = c.er
+			submitBtn.Text = "SUBMIT KEY"
 		elseif resultData == "empty" then
 			statusLabel.Text = "Please enter a key first!"
 			statusLabel.TextColor3 = c.er
