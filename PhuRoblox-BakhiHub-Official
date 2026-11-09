@@ -1,1 +1,18 @@
 
+local PlaceId = game.PlaceId
+
+-- Danh sách các game hỗ trợ
+local Games = {
+    [120219252362013] = "https://raw.githubusercontent.com/Giaphu1234531/Bakhihub/refs/heads/main/THROW%20FOOD%20FOR%20ANIMALS",
+}
+
+-- Kiểm tra và tải script tương ứng
+if Games[PlaceId] then
+    loadstring(game:HttpGet(Games[PlaceId]))()
+else
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Bakhi Hub",
+        Text = "Game này chưa được hỗ trợ! (PlaceId: " .. tostring(PlaceId) .. ")",
+        Duration = 6
+    })
+end
