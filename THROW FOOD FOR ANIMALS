@@ -1,18 +1,20 @@
 -- ==============================================================================
 -- BAKHI HUB - KEY SYSTEM & LOADER (THROW FOOD FOR ANIMALS V1.0)
--- FULL FIXED VERSION: MULTI-EXECUTOR + AUTO HWID + DETAILED ERROR REPORTING
+-- FULL FIXED VERSION: MULTI-EXECUTOR + AUTO HWID + WELCOME BACK + ANTI AFK
 -- ==============================================================================
 
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+local VirtualUser = game:GetService("VirtualUser")
 local CoreGui = game:GetService("CoreGui")
 local LocalPlayer = Players.LocalPlayer
 
 local WORKER_URL = "https://getkeybakhihub.giaphu23062008.workers.dev"
 local GAME_ID = "throw-food-animals"
 local KEY_PATH = "BaKhi/SavedKey.txt"
+local DISCORD_LINK = "https://discord.gg/2jusQEux88"
 
 -- ==============================================================================
 -- HÀM BỔ TRỢ HỆ THỐNG (HWID & HTTP REQUEST)
@@ -59,7 +61,6 @@ local function sendPostRequest(url, bodyTable)
 		return nil, "Không thể kết nối đến Worker (Kiểm tra lại mạng hoặc link Worker)!"
 	end
 
-	-- Khắc phục lỗi Body / body giữa các Executor
 	local rawBody = response.Body or response.body
 	if not rawBody or rawBody == "" then
 		local code = response.StatusCode or response.status_code or "N/A"
@@ -71,7 +72,7 @@ local function sendPostRequest(url, bodyTable)
 	end)
 
 	if not parseOk or type(data) ~= "table" then
-		return nil, "Phản hồi từ Server không đúng định dạng JSON: " .. tostring(rawBody):sub(1, 60)
+		return nil, "Phản hồi từ Server không đúng định dạng JSON."
 	end
 
 	return data, nil
@@ -361,8 +362,7 @@ local function loadMainScript()
 		table.insert(W.cn, sg:GetPropertyChangedSignal("AbsoluteSize"):Connect(fx))
 
 		local lv = {Full = true, Light = true, Off = true}
-		W.fx, W.ba, W.on, W.bk = lv[cd.fx] and cd.fx or ((uis.TouchEnabled and not uis.MouseEnabled) and "Light" or "Full"), cd.ba ~= false, false, false
-		if type(cd.gd) == "number" and cd.gd == cd.gd then W.gd = math.clamp(cd.gd, 40, 95) / 100 end
+		W.fx, W.ba, W.on, W.bk = "Full", true, false, false
 		cr.BackgroundTransparency = 1 - W.gd
 
 		local hr = mk("Frame", {AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(1, -65, 1, -55), Size = UDim2.fromOffset(250, 250), BackgroundTransparency = 1, Parent = bgh})
@@ -1058,10 +1058,21 @@ local function loadMainScript()
 		AutoEquip = false,
 		AutoRingRush = false,
 		MaxRingsPerRun = 150,
+		AntiAFK = true,
 		Running = true
 	}
 
 	local busy = { action = false }
+
+	-- Chống AFK qua sự kiện Idled mặc định
+	LocalPlayer.Idled:Connect(function()
+		if configState.AntiAFK then
+			pcall(function()
+				VirtualUser:CaptureController()
+				VirtualUser:ClickButton2(Vector2.new())
+			end)
+		end
+	end)
 
 	local function resetMovementLock()
 		pcall(function()
@@ -1074,6 +1085,31 @@ local function loadMainScript()
 			busy.action = false
 		end)
 	end
+
+	-- TÍNH NĂNG ẨN: TỰ ĐỘNG CHỘP HÀM CLAIM TỪ GAME ĐỂ HÚP QUÀ CHÀO MỪNG TRONG IM LẶNG
+	task.spawn(function()
+		while task.wait(2) do
+			if not configState.Running then break end
+			pcall(function()
+				local dataCtrl = DataController or safeRequire(findController("DataController"))
+				local offlineEarnings = safeRequire(findController("OfflineEarnings"))
+				
+				if dataCtrl and offlineEarnings then
+					local pending = tonumber(dataCtrl:GetPath("OfflinePending.Base")) or 0
+					if pending > 0 then
+						if type(offlineEarnings.Claim) == "function" then
+							offlineEarnings.Claim()
+						else
+							RemotesModule.Invoke("Offline_Claim")
+						end
+						
+						W:Notify({Title = "BAKHI HUB", Text = "Auto claimed Offline Earnings!", Time = 4})
+						task.wait(5)
+					end
+				end
+			end)
+		end
+	end)
 
 	-- [[ UI - MAIN TAB ]] --
 	tabMain:Section({Name = "Throw"})
@@ -1177,7 +1213,17 @@ local function loadMainScript()
 		Callback = function(v) configState.MaxRingsPerRun = v end
 	})
 
-	-- Nút Gỡ Kẹt (Unstuck)
+	-- [[ UI - SETTINGS TAB ]] --
+	tabSettings:Section({Name = "Utility"})
+	tabSettings:Toggle({
+		Name = "Anti AFK",
+		Default = true,
+		Flag = "AntiAFK",
+		Callback = function(v)
+			configState.AntiAFK = v
+		end
+	})
+
 	tabSettings:Section({Name = "Troubleshooting"})
 	tabSettings:Button({
 		Name = "Fix Movement (Unstuck)",
@@ -1610,7 +1656,7 @@ local mainBox = Instance.new("Frame")
 mainBox.Name = "KeyCard"
 mainBox.AnchorPoint = Vector2.new(0.5, 0.5)
 mainBox.Position = UDim2.fromScale(0.5, 0.5)
-mainBox.Size = UDim2.fromOffset(380, 240)
+mainBox.Size = UDim2.fromOffset(380, 270)
 mainBox.BackgroundColor3 = c.cr
 mainBox.BackgroundTransparency = 0.08
 mainBox.BorderSizePixel = 0
@@ -1700,6 +1746,7 @@ keyInput.FocusLost:Connect(function()
 	TweenService:Create(inputStroke, TweenInfo.new(0.2), { Transparency = 0.7, Color = c.ac }):Play()
 end)
 
+-- Button Submit
 local submitBtn = Instance.new("TextButton")
 submitBtn.Position = UDim2.fromOffset(24, 156)
 submitBtn.Size = UDim2.new(0.62, -30, 0, 42)
@@ -1715,6 +1762,7 @@ local submitCorner = Instance.new("UICorner")
 submitCorner.CornerRadius = UDim.new(0, 10)
 submitCorner.Parent = submitBtn
 
+-- Button Get Key
 local getKeyBtn = Instance.new("TextButton")
 getKeyBtn.Position = UDim2.new(0.66, 0, 0, 156)
 getKeyBtn.Size = UDim2.new(0.34, -24, 0, 42)
@@ -1736,6 +1784,23 @@ getKeyStroke.Color = c.ac
 getKeyStroke.Transparency = 0.6
 getKeyStroke.Parent = getKeyBtn
 
+-- Nút Discord
+local discordBtn = Instance.new("TextButton")
+discordBtn.Position = UDim2.fromOffset(24, 208)
+discordBtn.Size = UDim2.new(1, -48, 0, 38)
+discordBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+discordBtn.AutoButtonColor = false
+discordBtn.FontFace = fs
+discordBtn.Text = "THAM GIA DISCORD"
+discordBtn.TextColor3 = c.wt
+discordBtn.TextSize = 13
+discordBtn.Parent = mainBox
+
+local discordCorner = Instance.new("UICorner")
+discordCorner.CornerRadius = UDim.new(0, 10)
+discordCorner.Parent = discordBtn
+
+-- Close (X) Button
 local closeBtn = Instance.new("TextButton")
 closeBtn.Position = UDim2.new(1, -38, 0, 14)
 closeBtn.Size = UDim2.fromOffset(24, 24)
@@ -1754,8 +1819,9 @@ submitBtn.MouseEnter:Connect(function() TweenService:Create(submitBtn, TweenInfo
 submitBtn.MouseLeave:Connect(function() TweenService:Create(submitBtn, TweenInfo.new(0.15), { BackgroundColor3 = c.ac }):Play() end)
 getKeyBtn.MouseEnter:Connect(function() TweenService:Create(getKeyBtn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(30, 52, 80) }):Play() end)
 getKeyBtn.MouseLeave:Connect(function() TweenService:Create(getKeyBtn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(20, 36, 56) }):Play() end)
+discordBtn.MouseEnter:Connect(function() TweenService:Create(discordBtn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(105, 116, 245) }):Play() end)
+discordBtn.MouseLeave:Connect(function() TweenService:Create(discordBtn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(88, 101, 242) }):Play() end)
 
--- Nút Lấy Key (Tự gắn HWID vào URL để web ghi nhận đúng thiết bị)
 getKeyBtn.Activated:Connect(function()
 	local currentHwid = getHWID()
 	local targetUrl = WORKER_URL .. (currentHwid ~= "" and ("?hwid=" .. currentHwid) or "")
@@ -1766,6 +1832,17 @@ getKeyBtn.Activated:Connect(function()
 		statusLabel.TextColor3 = c.ok
 	else
 		statusLabel.Text = "Link: " .. targetUrl
+		statusLabel.TextColor3 = c.a2
+	end
+end)
+
+discordBtn.Activated:Connect(function()
+	if setclipboard or toclipboard then
+		pcall(function() (setclipboard or toclipboard)(DISCORD_LINK) end)
+		statusLabel.Text = "Đã copy link Discord! Dán vào trình duyệt để tham gia."
+		statusLabel.TextColor3 = c.ok
+	else
+		statusLabel.Text = "Discord: " .. DISCORD_LINK
 		statusLabel.TextColor3 = c.a2
 	end
 end)
