@@ -1,5 +1,6 @@
 -- ==============================================================================
 -- BAKHI HUB - KEY SYSTEM & LOADER (THROW FOOD FOR ANIMALS V1.0)
+-- FULL FIXED VERSION: MULTI-EXECUTOR + AUTO HWID + DETAILED ERROR REPORTING
 -- ==============================================================================
 
 local Players = game:GetService("Players")
@@ -8,96 +9,108 @@ local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
 local LocalPlayer = Players.LocalPlayer
-local sharedEnvironment = getgenv and getgenv() or _G
 
 local WORKER_URL = "https://getkeybakhihub.giaphu23062008.workers.dev"
 local GAME_ID = "throw-food-animals"
 local KEY_PATH = "BaKhi/SavedKey.txt"
 
--- Hàm băm HWID chuẩn chống giả mạo
-local function computeDigest(text)
-	local high = 0xcbf29ce4
-	local low = 0x84222325
-	for index = 1, #text do
-		low = bit32.bxor(low, string.byte(text, index))
-		local product = low * 435
-		high = (high * 435 + product // 4294967296 + bit32.lshift(low, 8)) % 4294967296
-		low = product % 4294967296
-	end
-	return string.format("%08x%08x", high, low)
-end
+-- ==============================================================================
+-- HÀM BỔ TRỢ HỆ THỐNG (HWID & HTTP REQUEST)
+-- ==============================================================================
 
-local function readRawDeviceId()
-	for _, functionName in {"gethwid", "get_hwid"} do
-		local readHardwareId = sharedEnvironment[functionName]
-		if type(readHardwareId) == "function" then
-			local succeeded, hardwareId = pcall(readHardwareId)
-			if succeeded and type(hardwareId) == "string" and #hardwareId >= 16 then
-				return hardwareId
-			end
+local function getHWID()
+	local hwid = ""
+	pcall(function()
+		if gethwid then
+			hwid = gethwid()
+		elseif syn and syn.get_hwid then
+			hwid = syn.get_hwid()
+		elseif fluxus and fluxus.get_device_id then
+			hwid = fluxus.get_device_id()
+		else
+			hwid = game:GetService("RbxAnalyticsService"):GetClientId()
 		end
-	end
-	local clientIdRead, clientId = pcall(function() return game:GetService("RbxAnalyticsService"):GetClientId() end)
-	if clientIdRead and type(clientId) == "string" then return clientId end
-	local userIdRead, userId = pcall(function() return Players.LocalPlayer.UserId end)
-	if userIdRead and type(userId) == "number" then return "U" .. userId end
-	return "UnknownDevice"
+	end)
+	return tostring(hwid or "")
 end
-
-local deviceDigest = computeDigest(readRawDeviceId())
 
 local function sendPostRequest(url, bodyTable)
 	local jsonBody = HttpService:JSONEncode(bodyTable)
-	local headers = { ["Content-Type"] = "application/json" }
-	local httpRequest = (syn and syn.request) or (http and http.request) or http_request or request
-	if httpRequest then
-		local response = httpRequest({
+	local headers = { 
+		["Content-Type"] = "application/json",
+		["User-Agent"] = "Roblox/BakhiHub"
+	}
+	
+	local httpRequest = (syn and syn.request) or (http and http.request) or http_request or request or (fluxus and fluxus.request) or (getgenv and getgenv().request)
+	if not httpRequest then
+		return nil, "Executor không hỗ trợ hàm gửi HTTP Request!"
+	end
+
+	local ok, response = pcall(function()
+		return httpRequest({
 			Url = url,
 			Method = "POST",
 			Headers = headers,
 			Body = jsonBody
 		})
-		if response and response.Body then
-			local ok, data = pcall(function() return HttpService:JSONDecode(response.Body) end)
-			if ok then return data end
-		end
+	end)
+
+	if not ok or not response then
+		return nil, "Không thể kết nối đến Worker (Kiểm tra lại mạng hoặc link Worker)!"
 	end
-	return nil
+
+	-- Khắc phục lỗi Body / body giữa các Executor
+	local rawBody = response.Body or response.body
+	if not rawBody or rawBody == "" then
+		local code = response.StatusCode or response.status_code or "N/A"
+		return nil, "Server không phản hồi dữ liệu (Mã lỗi HTTP: " .. tostring(code) .. ")"
+	end
+
+	local parseOk, data = pcall(function()
+		return HttpService:JSONDecode(rawBody)
+	end)
+
+	if not parseOk or type(data) ~= "table" then
+		return nil, "Phản hồi từ Server không đúng định dạng JSON: " .. tostring(rawBody):sub(1, 60)
+	end
+
+	return data, nil
 end
 
 local function validateKey(enteredKey)
-	if not enteredKey or enteredKey == "" then return false, "empty" end
+	if not enteredKey or enteredKey == "" then 
+		return false, "Vui lòng nhập key trước!" 
+	end
+	
 	local cleanKey = string.upper(tostring(enteredKey)):gsub("%s+", "")
+	local currentHwid = getHWID()
+
 	local payload = {
 		gameId = GAME_ID,
 		placeId = tostring(game.PlaceId),
 		key = cleanKey,
-		hwid = deviceDigest -- Đã thêm HWID để khớp với Server Worker
+		hwid = currentHwid
 	}
 
-	local success, result = pcall(function()
-		return sendPostRequest(WORKER_URL .. "/api/validate", payload)
-	end)
-
-	if success and result then
-		if result.valid == true then
-			return true, result.expiresAt
-		else
-			local reason = tostring(result.reason or result.message or ""):lower()
-			if reason:find("expire") then
-				return false, "expired"
-			elseif reason:find("khác") or reason:find("hwid") or reason:find("máy") then
-				return false, "wrong_device"
-			else
-				return false, "invalid"
-			end
-		end
+	local result, err = sendPostRequest(WORKER_URL .. "/api/validate", payload)
+	if not result then
+		return false, err
 	end
-	return false, "network_error"
+
+	if result.valid == true then
+		local nowMs = DateTime.now().UnixTimestampMillis
+		if result.expiresAt and result.expiresAt <= nowMs then
+			return false, "Key này đã hết hạn sử dụng!"
+		end
+		return true, result.expiresAt
+	else
+		local reason = result.reason or result.error or result.message or "Key không hợp lệ hoặc sai game!"
+		return false, reason
+	end
 end
 
 -- ==============================================================================
--- NỘI DUNG CHÍNH CỦA HUB
+-- NỘI DUNG CHÍNH CỦA HUB (MAIN SCRIPT)
 -- ==============================================================================
 local function loadMainScript()
 	local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -1559,7 +1572,7 @@ local function loadMainScript()
 end
 
 -- ==============================================================================
--- TỰ ĐỘNG KIỂM TRA KEY ĐÃ LƯU TRƯỚC ĐÓ VÀ HIỂN THỊ UI CHECK KEY
+-- GIAO DIỆN KIỂM TRA KEY (KEY CARD UI)
 -- ==============================================================================
 
 local keyGui = Instance.new("ScreenGui")
@@ -1638,7 +1651,7 @@ subTitle.Parent = mainBox
 
 local statusLabel = Instance.new("TextLabel")
 statusLabel.Name = "Status"
-statusLabel.Text = "Checking for saved keys..."
+statusLabel.Text = "Đang kiểm tra key..."
 statusLabel.FontFace = fn
 statusLabel.TextSize = 12
 statusLabel.TextColor3 = c.a2
@@ -1671,7 +1684,7 @@ keyInput.Size = UDim2.new(1, -24, 1, 0)
 keyInput.BackgroundTransparency = 1
 keyInput.ClearTextOnFocus = false
 keyInput.FontFace = fs
-keyInput.PlaceholderText = "Paste BAKHI-XXXX key here..."
+keyInput.PlaceholderText = "Dán mã key BAKHI-XXXX vào đây..."
 keyInput.PlaceholderColor3 = Color3.fromRGB(90, 115, 140)
 keyInput.Text = ""
 keyInput.TextColor3 = c.wt
@@ -1693,7 +1706,7 @@ submitBtn.Size = UDim2.new(0.62, -30, 0, 42)
 submitBtn.BackgroundColor3 = c.ac
 submitBtn.AutoButtonColor = false
 submitBtn.FontFace = fs
-submitBtn.Text = "CHECKING..."
+submitBtn.Text = "KIỂM TRA..."
 submitBtn.TextColor3 = c.cr
 submitBtn.TextSize = 13
 submitBtn.Parent = mainBox
@@ -1708,7 +1721,7 @@ getKeyBtn.Size = UDim2.new(0.34, -24, 0, 42)
 getKeyBtn.BackgroundColor3 = Color3.fromRGB(20, 36, 56)
 getKeyBtn.AutoButtonColor = false
 getKeyBtn.FontFace = fs
-getKeyBtn.Text = "GET KEY"
+getKeyBtn.Text = "LẤY KEY"
 getKeyBtn.TextColor3 = c.a2
 getKeyBtn.TextSize = 13
 getKeyBtn.Parent = mainBox
@@ -1742,40 +1755,44 @@ submitBtn.MouseLeave:Connect(function() TweenService:Create(submitBtn, TweenInfo
 getKeyBtn.MouseEnter:Connect(function() TweenService:Create(getKeyBtn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(30, 52, 80) }):Play() end)
 getKeyBtn.MouseLeave:Connect(function() TweenService:Create(getKeyBtn, TweenInfo.new(0.15), { BackgroundColor3 = Color3.fromRGB(20, 36, 56) }):Play() end)
 
+-- Nút Lấy Key (Tự gắn HWID vào URL để web ghi nhận đúng thiết bị)
 getKeyBtn.Activated:Connect(function()
+	local currentHwid = getHWID()
+	local targetUrl = WORKER_URL .. (currentHwid ~= "" and ("?hwid=" .. currentHwid) or "")
+	
 	if setclipboard or toclipboard then
-		pcall(function() (setclipboard or toclipboard)(WORKER_URL) end)
-		statusLabel.Text = "Link copied to clipboard! Open browser to get key."
+		pcall(function() (setclipboard or toclipboard)(targetUrl) end)
+		statusLabel.Text = "Đã sao chép link kèm HWID! Hãy dán vào trình duyệt."
 		statusLabel.TextColor3 = c.ok
 	else
-		statusLabel.Text = "Link: " .. WORKER_URL
+		statusLabel.Text = "Link: " .. targetUrl
 		statusLabel.TextColor3 = c.a2
 	end
 end)
 
 local function validateAndProceed(entered, isAuto)
 	if not entered or entered == "" then
-		statusLabel.Text = "Please enter a key first!"
+		statusLabel.Text = "Vui lòng nhập key trước!"
 		statusLabel.TextColor3 = c.er
-		submitBtn.Text = "SUBMIT KEY"
+		submitBtn.Text = "XÁC NHẬN"
 		return
 	end
 
-	statusLabel.Text = isAuto and "Checking saved key..." or "Checking key with server..."
+	statusLabel.Text = isAuto and "Đang kiểm tra key đã lưu..." or "Đang kết nối xác thực với server..."
 	statusLabel.TextColor3 = c.a2
-	submitBtn.Text = "CHECKING..."
+	submitBtn.Text = "ĐANG XỬ LÝ..."
 
 	task.spawn(function()
-		local isValid, resultData = validateKey(entered)
+		local isValid, dataOrError = validateKey(entered)
 		if isValid then
 			local expireMsg = ""
-			if resultData then
-				local expireDate = os.date("%H:%M:%S - %d/%m/%Y", math.floor(resultData / 1000))
-				expireMsg = " (Expires: " .. expireDate .. ")"
+			if dataOrError then
+				local expireDate = os.date("%H:%M:%S - %d/%m/%Y", math.floor(dataOrError / 1000))
+				expireMsg = " (HSD: " .. expireDate .. ")"
 			end
-			statusLabel.Text = "Key verified successfully!" .. expireMsg
+			statusLabel.Text = "Xác thực thành công!" .. expireMsg
 			statusLabel.TextColor3 = c.ok
-			submitBtn.Text = "SUCCESS"
+			submitBtn.Text = "THÀNH CÔNG"
 
 			pcall(function()
 				if writefile then
@@ -1790,22 +1807,10 @@ local function validateAndProceed(entered, isAuto)
 			keyGui:Destroy()
 
 			loadMainScript()
-		elseif resultData == "expired" then
-			statusLabel.Text = "This key has expired! Click GET KEY for a new one."
-			statusLabel.TextColor3 = c.er
-			submitBtn.Text = "EXPIRED"
-		elseif resultData == "wrong_device" then
-			statusLabel.Text = "Key này đăng ký cho máy khác. Tự get key đi!"
-			statusLabel.TextColor3 = c.er
-			submitBtn.Text = "SUBMIT KEY"
-		elseif resultData == "empty" then
-			statusLabel.Text = "Please enter a key first!"
-			statusLabel.TextColor3 = c.er
-			submitBtn.Text = "SUBMIT KEY"
 		else
-			statusLabel.Text = "Invalid key! Click GET KEY to obtain one."
+			statusLabel.Text = tostring(dataOrError)
 			statusLabel.TextColor3 = c.er
-			submitBtn.Text = "SUBMIT KEY"
+			submitBtn.Text = "THỬ LẠI"
 		end
 	end)
 end
@@ -1814,6 +1819,7 @@ submitBtn.Activated:Connect(function()
 	validateAndProceed(keyInput.Text, false)
 end)
 
+-- Tự động kiểm tra Key đã lưu từ trước
 if isfile and isfile(KEY_PATH) then
 	local savedKey = readfile(KEY_PATH)
 	if savedKey and savedKey ~= "" then
@@ -1823,10 +1829,10 @@ if isfile and isfile(KEY_PATH) then
 			validateAndProceed(savedKey, true)
 		end)
 	else
-		statusLabel.Text = "Enter your key to unlock the hub"
-		submitBtn.Text = "SUBMIT KEY"
+		statusLabel.Text = "Nhập mã key để mở khóa giao diện"
+		submitBtn.Text = "XÁC NHẬN"
 	end
 else
-	statusLabel.Text = "Enter your key to unlock the hub"
-	submitBtn.Text = "SUBMIT KEY"
+	statusLabel.Text = "Nhập mã key để mở khóa giao diện"
+	submitBtn.Text = "XÁC NHẬN"
 end
