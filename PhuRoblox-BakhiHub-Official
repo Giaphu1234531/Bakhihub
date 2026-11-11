@@ -1,18 +1,16 @@
 local PlaceId = game.PlaceId
 
--- Danh sách các game hỗ trợ
 local Games = {
-    [120219252362013] = "https://raw.githubusercontent.com/Giaphu1234531/Bakhihub/refs/heads/main/THROW%20FOOD%20FOR%20ANIMALS",
+    [120219252362013] = "https://api.xhider.xyz/files/v4/loaders/e9a862a665e0339d8bc4059a480ad322.lua",
     [107778070777162] = "https://raw.githubusercontent.com/kaeldrinnovasse/BaKhiHub/refs/heads/main/StealAnEgg.lua",
 }
 
--- Kiểm tra và tải script tương ứng
 if Games[PlaceId] then
     loadstring(game:HttpGet(Games[PlaceId]))()
 else
     game:GetService("StarterGui"):SetCore("SendNotification", {
         Title = "Bakhi Hub",
-        Text = "Game này chưa được hỗ trợ! (PlaceId: " .. tostring(PlaceId) .. ")",
+        Text = "Game chưa hỗ trợ! (" .. PlaceId .. ")",
         Duration = 6
     })
 end
