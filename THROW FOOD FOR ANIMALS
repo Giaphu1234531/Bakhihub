@@ -1,6 +1,6 @@
 -- ==============================================================================
--- BAKHI HUB - KEY SYSTEM & LOADER (THROW FOOD FOR ANIMALS V1.2)
--- FULL FIXED VERSION: LIVE MULTI-LANGUAGE + AUTO HWID + HIDDEN AUTO WELCOME BACK + EFFECTS
+-- BAKHI HUB - INSTANT LOAD VERSION (NO BOOT ANIMATION) + MULTI-LANGUAGE
+-- THROW FOOD FOR ANIMALS V1.2 (FIXED AUTO BUY & EQUIP FOOD)
 -- ==============================================================================
 
 local Players = game:GetService("Players")
@@ -17,124 +17,34 @@ local KEY_PATH = "BaKhi/SavedKey.txt"
 local LANG_PATH = "BaKhi/Language.txt"
 local DISCORD_LINK = "https://discord.gg/2jusQEux88"
 
--- ==============================================================================
--- LANGUAGE SYSTEM (HỆ THỐNG NGÔN NGỮ)
--- ==============================================================================
-
 local Langs = {
 	["English"] = {
-		Title = "BAKHI HUB",
-		SubTitle = "KEY VERIFICATION SYSTEM",
-		StatusCheck = "Checking key...",
-		StatusWait = "Enter your key to unlock the hub",
-		StatusCopiedWorker = "Link copied to clipboard! Open browser to get key.",
-		StatusCopiedDiscord = "Discord link copied! Open browser to join.",
-		StatusInvalid = "Invalid key! Click GET KEY to obtain one.",
-		StatusExpired = "This key has expired! Click GET KEY for a new one.",
-		StatusEmpty = "Please enter a key first!",
-		StatusSuccess = "Key verified successfully!",
-		BtnSubmit = "SUBMIT KEY",
-		BtnChecking = "CHECKING...",
-		BtnSuccess = "SUCCESS",
-		BtnExpired = "EXPIRED",
-		BtnRetry = "RETRY",
-		BtnGetKey = "GET KEY",
-		BtnDiscord = "JOIN DISCORD",
-		Placeholder = "Paste BAKHI-XXXX key here...",
-		MainTab = "Main",
-		EventTab = "Event",
-		SettingsTab = "Settings",
-		ThrowSec = "Throw",
-		AutoThrow = "Auto Throw",
-		TrainSec = "Training",
-		AutoTrain = "Auto Training",
-		AutoUpStand = "Auto Upgrade Stand",
-		PetSec = "Auto Sell",
-		AutoSellPets = "Auto Sell Pets",
-		FilterRarities = "Filter Sell Rarities",
-		FilterMutations = "Filter Sell Mutations",
-		PlotSec = "Plot & Shop",
-		AutoUpFence = "Auto Upgrade Fence",
-		AutoBuyFood = "Auto Buy Food",
-		AutoEquipBest = "Auto Equip Best",
-		RingRushSec = "Ring Rush Event",
-		AutoRingRush = "Auto Ring Rush",
-		MaxRings = "Max Rings Per Run",
-		StatusEventActive = "Status: ACTIVE",
-		StatusEventWait = "Status: Waiting for Event...",
-		OfflineSec = "Offline Rewards",
-		ClaimWelcome = "Claim Welcome Back",
-		InterfaceSec = "Interface",
-		Effects = "UI Effects",
-		GlassDensity = "Glass Density",
-		BootAnim = "Boot Animation",
-		UtilSec = "Utility",
-		AntiAFK = "Anti AFK",
-		TroubleSec = "Troubleshooting",
-		FixMovement = "Fix Movement (Unstuck)",
-		LangSec = "Language",
-		SelectLang = "Select Language",
-		NotifLoaded = "Loaded successfully! Have fun!",
-		NotifClaimed = "Auto claimed Offline Earnings!",
-		NotifFix = "Movement and camera locks removed!",
-		NotifLangSaved = "Language updated successfully!"
+		Title = "BAKHI HUB", SubTitle = "KEY VERIFICATION SYSTEM", StatusCheck = "Checking key...", StatusWait = "Enter your key to unlock the hub",
+		StatusCopiedWorker = "Link copied to clipboard! Open browser to get key.", StatusCopiedDiscord = "Discord link copied! Open browser to join.",
+		StatusInvalid = "Invalid key! Click GET KEY to obtain one.", StatusExpired = "This key has expired! Click GET KEY for a new one.",
+		StatusEmpty = "Please enter a key first!", StatusSuccess = "Key verified successfully!", BtnSubmit = "SUBMIT KEY", BtnChecking = "CHECKING...",
+		BtnSuccess = "SUCCESS", BtnExpired = "EXPIRED", BtnRetry = "RETRY", BtnGetKey = "GET KEY", BtnDiscord = "JOIN DISCORD", Placeholder = "Paste BAKHI-XXXX key here...",
+		MainTab = "Main", EventTab = "Event", SettingsTab = "Settings", ThrowSec = "Throw", AutoThrow = "Auto Throw", TrainSec = "Training", AutoTrain = "Auto Training",
+		AutoUpStand = "Auto Upgrade Stand", PetSec = "Auto Sell", AutoSellPets = "Auto Sell Pets", FilterRarities = "Filter Sell Rarities", FilterMutations = "Filter Sell Mutations",
+		PlotSec = "Plot & Shop", AutoUpFence = "Auto Upgrade Fence", AutoBuyFood = "Auto Buy Food", AutoEquipBest = "Auto Equip Best", RingRushSec = "Ring Rush Event",
+		AutoRingRush = "Auto Ring Rush", MaxRings = "Max Rings Per Run", StatusEventActive = "Status: ACTIVE", StatusEventWait = "Status: Waiting for Event...",
+		OfflineSec = "Offline Rewards", ClaimWelcome = "Claim Welcome Back", InterfaceSec = "Interface", Effects = "UI Effects", GlassDensity = "Glass Density",
+		UtilSec = "Utility", AntiAFK = "Anti AFK", TroubleSec = "Troubleshooting", FixMovement = "Fix Movement (Unstuck)", LangSec = "Language", SelectLang = "Select Language",
+		NotifLoaded = "Loaded successfully! Have fun!", NotifClaimed = "Auto claimed Offline Earnings!", NotifFix = "Movement and camera locks removed!", NotifLangSaved = "Language updated successfully!"
 	},
 	["Vietnamese"] = {
-		Title = "BAKHI HUB",
-		SubTitle = "HỆ THỐNG XÁC THỰC KEY",
-		StatusCheck = "Đang kiểm tra key...",
-		StatusWait = "Nhập mã key để mở khóa giao diện",
-		StatusCopiedWorker = "Đã sao chép link! Hãy dán vào trình duyệt.",
-		StatusCopiedDiscord = "Đã sao chép link Discord! Dán vào trình duyệt để tham gia.",
-		StatusInvalid = "Key không hợp lệ! Bấm LẤY KEY để nhận.",
-		StatusExpired = "Key này đã hết hạn! Bấm LẤY KEY để nhận mới.",
-		StatusEmpty = "Vui lòng nhập key trước!",
-		StatusSuccess = "Xác thực thành công!",
-		BtnSubmit = "XÁC NHẬN",
-		BtnChecking = "ĐANG XỬ LÝ...",
-		BtnSuccess = "THÀNH CÔNG",
-		BtnExpired = "HẾT HẠN",
-		BtnRetry = "THỬ LẠI",
-		BtnGetKey = "LẤY KEY",
-		BtnDiscord = "THAM GIA DISCORD",
-		Placeholder = "Dán mã key BAKHI-XXXX vào đây...",
-		MainTab = "Chức Năng",
-		EventTab = "Sự Kiện",
-		SettingsTab = "Cài Đặt",
-		ThrowSec = "Ném",
-		AutoThrow = "Tự Động Ném",
-		TrainSec = "Huấn Luyện",
-		AutoTrain = "Tự Động Tập Luyện",
-		AutoUpStand = "Tự Nâng Cấp Xà",
-		PetSec = "Tự Động Bán",
-		AutoSellPets = "Tự Động Bán Thú",
-		FilterRarities = "Lọc Độ Hiếm Bán",
-		FilterMutations = "Lọc Đột Biến Bán",
-		PlotSec = "Đất & Cửa Hàng",
-		AutoUpFence = "Tự Nâng Cấp Rào",
-		AutoBuyFood = "Tự Mua Thức Ăn",
-		AutoEquipBest = "Tự Trang Bị Tốt Nhất",
-		RingRushSec = "Sự kiện Vượt Vòng",
-		AutoRingRush = "Tự Động Vượt Vòng",
-		MaxRings = "Số Vòng Tối Đa Mỗi Chuyến",
-		StatusEventActive = "Trạng thái: ĐANG MỞ",
-		StatusEventWait = "Trạng thái: Đang chờ sự kiện...",
-		OfflineSec = "Quà Rời Mạng",
-		ClaimWelcome = "Nhận Quà Chào Mừng",
-		InterfaceSec = "Giao Diện UI",
-		Effects = "Mức Độ Hiệu Ứng",
-		GlassDensity = "Độ Mờ Kính (Nền)",
-		BootAnim = "Hoạt Ảnh Mở Menu",
-		UtilSec = "Tiện Ích",
-		AntiAFK = "Chống Kích Hoạt Động (Anti AFK)",
-		TroubleSec = "Sửa Lỗi",
-		FixMovement = "Sửa Lỗi Kẹt Di Chuyển",
-		LangSec = "Ngôn Ngữ",
-		SelectLang = "Chọn Ngôn Ngữ",
-		NotifLoaded = "Tải thành công! Chúc chơi vui vẻ!",
-		NotifClaimed = "Đã tự động nhận tiền Offline!",
-		NotifFix = "Đã xóa khóa góc nhìn và di chuyển!",
-		NotifLangSaved = "Chuyển đổi ngôn ngữ thành công!"
+		Title = "BAKHI HUB", SubTitle = "HỆ THỐNG XÁC THỰC KEY", StatusCheck = "Đang kiểm tra key...", StatusWait = "Nhập mã key để mở khóa giao diện",
+		StatusCopiedWorker = "Đã sao chép link! Hãy dán vào trình duyệt.", StatusCopiedDiscord = "Đã sao chép link Discord! Dán vào trình duyệt để tham gia.",
+		StatusInvalid = "Key không hợp lệ! Bấm LẤY KEY để nhận.", StatusExpired = "Key này đã hết hạn! Bấm LẤY KEY để nhận mới.",
+		StatusEmpty = "Vui lòng nhập key trước!", StatusSuccess = "Xác thực thành công!", BtnSubmit = "XÁC NHẬN", BtnChecking = "ĐANG XỬ LÝ...",
+		BtnSuccess = "THÀNH CÔNG", BtnExpired = "HẾT HẠN", BtnRetry = "THỬ LẠI", BtnGetKey = "LẤY KEY", BtnDiscord = "THAM GIA DISCORD", Placeholder = "Dán mã key BAKHI-XXXX vào đây...",
+		MainTab = "Chức Năng", EventTab = "Sự Kiện", SettingsTab = "Cài Đặt", ThrowSec = "Ném", AutoThrow = "Tự Động Ném", TrainSec = "Huấn Luyện", AutoTrain = "Tự Động Tập Luyện",
+		AutoUpStand = "Tự Nâng Cấp Xà", PetSec = "Tự Động Bán", AutoSellPets = "Tự Động Bán Thú", FilterRarities = "Lọc Độ Hiếm Bán", FilterMutations = "Lọc Đột Biến Bán",
+		PlotSec = "Đất & Cửa Hàng", AutoUpFence = "Tự Nâng Cấp Rào", AutoBuyFood = "Tự Mua Thức Ăn", AutoEquipBest = "Tự Trang Bị Tốt Nhất", RingRushSec = "Sự kiện Vượt Vòng",
+		AutoRingRush = "Tự Động Vượt Vòng", MaxRings = "Số Vòng Tối Đa Mỗi Chuyến", StatusEventActive = "Trạng thái: ĐANG MỞ", StatusEventWait = "Trạng thái: Đang chờ sự kiện...",
+		OfflineSec = "Quà Rời Mạng", ClaimWelcome = "Nhận Quà Chào Mừng", InterfaceSec = "Giao Diện UI", Effects = "Mức Độ Hiệu Ứng", GlassDensity = "Độ Mờ Kính (Nền)",
+		UtilSec = "Tiện Ích", AntiAFK = "Chống Kích Hoạt Động (Anti AFK)", TroubleSec = "Sửa Lỗi", FixMovement = "Sửa Lỗi Kẹt Di Chuyển", LangSec = "Ngôn Ngữ", SelectLang = "Chọn Ngôn Ngữ",
+		NotifLoaded = "Tải thành công! Chúc chơi vui vẻ!", NotifClaimed = "Đã tự động nhận tiền Offline!", NotifFix = "Đã xóa khóa góc nhìn và di chuyển!", NotifLangSaved = "Chuyển đổi ngôn ngữ thành công!"
 	}
 }
 
@@ -143,9 +53,7 @@ local currentLang = "English"
 local function loadLanguage()
 	if isfile and isfile(LANG_PATH) then
 		local savedLang = readfile(LANG_PATH)
-		if savedLang == "Vietnamese" or savedLang == "English" then
-			currentLang = savedLang
-		end
+		if savedLang == "Vietnamese" or savedLang == "English" then currentLang = savedLang end
 	end
 end
 
@@ -158,136 +66,64 @@ end
 
 loadLanguage()
 
-local function T(key)
-	return Langs[currentLang][key] or key
-end
-
--- ==============================================================================
--- HÀM BỔ TRỢ HỆ THỐNG (HWID & HTTP REQUEST)
--- ==============================================================================
+local function T(key) return Langs[currentLang][key] or key end
 
 local function getHWID()
 	local hwid = ""
 	pcall(function()
-		if gethwid then
-			hwid = gethwid()
-		elseif syn and syn.get_hwid then
-			hwid = syn.get_hwid()
-		elseif fluxus and fluxus.get_device_id then
-			hwid = fluxus.get_device_id()
-		else
-			hwid = game:GetService("RbxAnalyticsService"):GetClientId()
-		end
+		if gethwid then hwid = gethwid()
+		elseif syn and syn.get_hwid then hwid = syn.get_hwid()
+		elseif fluxus and fluxus.get_device_id then hwid = fluxus.get_device_id()
+		else hwid = game:GetService("RbxAnalyticsService"):GetClientId() end
 	end)
 	return tostring(hwid or "")
 end
 
 local function sendPostRequest(url, bodyTable)
 	local jsonBody = HttpService:JSONEncode(bodyTable)
-	local headers = { 
-		["Content-Type"] = "application/json",
-		["User-Agent"] = "Roblox/BakhiHub"
-	}
-	
+	local headers = { ["Content-Type"] = "application/json", ["User-Agent"] = "Roblox/BakhiHub" }
 	local httpRequest = (syn and syn.request) or (http and http.request) or http_request or request or (fluxus and fluxus.request) or (getgenv and getgenv().request)
-	if not httpRequest then
-		return nil, "Executor không hỗ trợ hàm gửi HTTP Request!"
-	end
-
-	local ok, response = pcall(function()
-		return httpRequest({
-			Url = url,
-			Method = "POST",
-			Headers = headers,
-			Body = jsonBody
-		})
-	end)
-
-	if not ok or not response then
-		return nil, "Không thể kết nối đến Worker!"
-	end
-
+	if not httpRequest then return nil, "Executor error" end
+	local ok, response = pcall(function() return httpRequest({ Url = url, Method = "POST", Headers = headers, Body = jsonBody }) end)
+	if not ok or not response then return nil, "Connection error" end
 	local rawBody = response.Body or response.body
-	if not rawBody or rawBody == "" then
-		return nil, "Server không phản hồi dữ liệu!"
-	end
-
-	local parseOk, data = pcall(function()
-		return HttpService:JSONDecode(rawBody)
-	end)
-
-	if not parseOk or type(data) ~= "table" then
-		return nil, "Phản hồi từ Server không đúng định dạng JSON."
-	end
-
+	if not rawBody or rawBody == "" then return nil, "No response" end
+	local parseOk, data = pcall(function() return HttpService:JSONDecode(rawBody) end)
+	if not parseOk or type(data) ~= "table" then return nil, "Invalid JSON" end
 	return data, nil
 end
 
 local function validateKey(enteredKey)
-	if not enteredKey or enteredKey == "" then 
-		return false, "empty"
-	end
-	
-	local cleanKey = string.upper(tostring(enteredKey)):gsub("%s+", "")
-	local currentHwid = getHWID()
-
-	local payload = {
-		gameId = GAME_ID,
-		placeId = tostring(game.PlaceId),
-		key = cleanKey,
-		hwid = currentHwid
-	}
-
+	if not enteredKey or enteredKey == "" then return false, "empty" end
+	local payload = { gameId = GAME_ID, placeId = tostring(game.PlaceId), key = string.upper(tostring(enteredKey)):gsub("%s+", ""), hwid = getHWID() }
 	local result, err = sendPostRequest(WORKER_URL .. "/api/validate", payload)
-	if not result then
-		return false, err
-	end
-
+	if not result then return false, err end
 	if result.valid == true then
 		local nowMs = DateTime.now().UnixTimestampMillis
-		if result.expiresAt and result.expiresAt <= nowMs then
-			return false, "expired"
-		end
+		if result.expiresAt and result.expiresAt <= nowMs then return false, "expired" end
 		return true, result.expiresAt
 	else
-		local reason = result.reason or result.error or result.message or "invalid"
-		return false, reason
+		return false, result.reason or result.error or result.message or "invalid"
 	end
 end
 
--- ==============================================================================
--- NỘI DUNG CHÍNH CỦA HUB (MAIN SCRIPT)
--- ==============================================================================
 local function loadMainScript()
 	local ReplicatedStorage = game:GetService("ReplicatedStorage")
 	local RemotesModule = require(ReplicatedStorage.Shared.Remotes)
 	local RemotesFolder = ReplicatedStorage:WaitForChild("Remotes")
 	local EquipBestRemote = RemotesFolder:WaitForChild("Plot_EquipBest")
-
-	-- [[ DYNAMIC TEXT REGISTRY FOR LIVE TRANSLATION ]]
+	
 	local DynamicUITexts = {}
-	local function RegT(uiObj, langKey, elemType)
-		table.insert(DynamicUITexts, {obj = uiObj, key = langKey, type = elemType})
-	end
-
+	local function RegT(uiObj, langKey, elemType) table.insert(DynamicUITexts, {obj = uiObj, key = langKey, type = elemType}) end
 	local function UpdateAllLanguageTexts()
 		for _, item in ipairs(DynamicUITexts) do
 			local newText = T(item.key)
-			if item.type == "Tab" then
-				item.obj.nm.Text = newText
-			elseif item.type == "Section" then
-				if item.obj and item.obj.Label then
-					item.obj.Label.Text = string.upper(newText)
-				end
-			elseif item.type == "Normal" then
-				if item.obj and item.obj.Label then
-					item.obj.Label.Text = newText
-				end
-			end
+			if item.type == "Tab" then item.obj.nm.Text = newText
+			elseif item.type == "Section" and item.obj and item.obj.Label then item.obj.Label.Text = string.upper(newText)
+			elseif item.type == "Normal" and item.obj and item.obj.Label then item.obj.Label.Text = newText end
 		end
 	end
 
-	-- [[ BAKHI UI LIBRARY ]] --
 	local ps, uis, tws, gs, hs = game:GetService("Players"), game:GetService("UserInputService"), game:GetService("TweenService"), game:GetService("GuiService"), game:GetService("HttpService")
 	local ge = getgenv and getgenv() or _G
 	local hx, wt = Color3.fromHex, Color3.new(1, 1, 1)
@@ -300,64 +136,55 @@ local function loadMainScript()
 	local ti, tb2 = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 
 	local L = {Flags = {}}
-
 	local function mk(k, p, ch)
 		local o = Instance.new(k)
-		for i, v in p do if i ~= "Parent" then o[i] = v end end
-		for _, x in ch or {} do x.Parent = o end
+		for i, v in pairs(p) do if i ~= "Parent" then o[i] = v end end
+		for _, x in ipairs(ch or {}) do x.Parent = o end
 		o.Parent = p.Parent
 		return o
 	end
-
 	local function rc(r) return mk("UICorner", {CornerRadius = UDim.new(0, r)}) end
 	local function sk(t, col, w) return mk("UIStroke", {Color = col or wt, Transparency = t, Thickness = w or 1, ApplyStrokeMode = Enum.ApplyStrokeMode.Border}) end
 	local function pd(l, r, t, b) return mk("UIPadding", {PaddingLeft = UDim.new(0, l), PaddingRight = UDim.new(0, r or l), PaddingTop = UDim.new(0, t or 0), PaddingBottom = UDim.new(0, b or t or 0)}) end
 	local function ll(g) return mk("UIListLayout", {Padding = UDim.new(0, g), SortOrder = Enum.SortOrder.LayoutOrder}) end
 	local function tw(o, p, i) tws:Create(o, i or ti, p):Play() end
 	local function ns(t) local k = {}; for i = 1, #t, 2 do k[#k + 1] = NumberSequenceKeypoint.new(t[i], t[i + 1]) end; return NumberSequence.new(k) end
-
 	local function tl(p, ch)
 		local d = {BackgroundTransparency = 1, FontFace = fn, TextColor3 = wt, TextSize = 14, TextXAlignment = Enum.TextXAlignment.Left, Text = ""}
-		for i, v in p do d[i] = v end
+		for i, v in pairs(p) do d[i] = v end
 		return mk("TextLabel", d, ch)
 	end
-
 	local function ig(p, ch)
 		local d = {BackgroundTransparency = 1, FontFace = ir, TextColor3 = c.dm, TextSize = 14, Text = ""}
-		for i, v in p do d[i] = v end
+		for i, v in pairs(p) do d[i] = v end
 		return mk("TextLabel", d, ch)
 	end
-
 	local function bt(p, ch)
 		local d = {BackgroundTransparency = 1, AutoButtonColor = false, Text = "", BorderSizePixel = 0}
-		for i, v in p do d[i] = v end
+		for i, v in pairs(p) do d[i] = v end
 		return mk("TextButton", d, ch)
 	end
-
 	local function rg(s, w, col, t, q)
 		return mk("Frame", {AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromOffset(s, s), BackgroundTransparency = 1}, {rc(s), mk("UIStroke", {Color = col, Thickness = w, Transparency = t or 0}, {q and mk("UIGradient", {Transparency = ns(q)}) or nil})})
 	end
-
 	local function rx(p, s)
 		local f = mk("Frame", {Size = UDim2.fromOffset(s, s), BackgroundTransparency = 1, Parent = p})
 		local a = rg(s - 2, 2, c.ac, 0, {0, 0, 0.34, 0, 0.35, 1, 0.65, 1, 0.66, 0, 1, 0})
 		local b = rg(math.round(s * 0.62), 1, c.a2, 0, {0, 0, 0.5, 0, 0.6, 1, 1, 1})
 		a.Parent, b.Parent = f, f
 		local d = mk("Frame", {AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromOffset(math.round(s * 0.3), math.round(s * 0.3)), BackgroundColor3 = c.hi, BorderSizePixel = 0, Parent = f}, {rc(s), sk(0.4, c.ac, 2)})
-		for _, x in {a, b, d} do
+		for _, x in ipairs({a, b, d}) do
 			x.Size = UDim2.fromScale(x.Size.X.Offset / s, x.Size.Y.Offset / s)
 			x:FindFirstChildOfClass("UICorner").CornerRadius = UDim.new(0.5, 0)
 		end
 		return f, a, b
 	end
 	L.Reactor = rx
-
 	local function gui()
 		local sg = mk("ScreenGui", {Name = hs:GenerateGUID(false), IgnoreGuiInset = true, ResetOnSpawn = false, ZIndexBehavior = Enum.ZIndexBehavior.Sibling, DisplayOrder = 999})
 		if not pcall(function() sg.Parent = gethui and gethui() or CoreGui end) then sg.Parent = ps.LocalPlayer:WaitForChild("PlayerGui") end
 		return sg
 	end
-
 	local function fit(sg, f, sc)
 		local s, i = sg.AbsoluteSize, gs:GetGuiInset().Y
 		local v = math.clamp(math.min((s.X - 24) / ww, (s.Y - i - 24) / wh), 0.5, 1)
@@ -365,16 +192,12 @@ local function loadMainScript()
 		f.Position = UDim2.fromOffset(s.X / 2, i + (s.Y - i) / 2)
 		return v
 	end
-
 	local function cfn(s)
 		if s == nil then return true end
 		if type(s) ~= "string" or s == "" then return false end
-		for sg in (s .. "/"):gmatch("([^/]*)/") do
-			if not sg:match("^[%w _%-]+$") then return false end
-		end
+		for sg in (s .. "/"):gmatch("([^/]*)/") do if not sg:match("^[%w _%-]+$") then return false end end
 		return true
 	end
-
 	local function mkd(p)
 		local d = ""
 		for sg in p:gmatch("([^/]+)/") do
@@ -382,21 +205,12 @@ local function loadMainScript()
 			if not isfolder(d) then makefolder(d) end
 		end
 	end
-
 	local function hv(f, st)
-		f.MouseEnter:Connect(function()
-			if not uis.MouseEnabled then return end
-			tw(f, {BackgroundColor3 = c.ac, BackgroundTransparency = 0.93})
-			tw(st, {Color = c.ac, Transparency = 0.67})
-		end)
-		f.MouseLeave:Connect(function()
-			tw(f, {BackgroundColor3 = wt, BackgroundTransparency = 0.957})
-			tw(st, {Color = wt, Transparency = 0.92})
-		end)
+		f.MouseEnter:Connect(function() if not uis.MouseEnabled then return end tw(f, {BackgroundColor3 = c.ac, BackgroundTransparency = 0.93}) tw(st, {Color = c.ac, Transparency = 0.67}) end)
+		f.MouseLeave:Connect(function() tw(f, {BackgroundColor3 = wt, BackgroundTransparency = 0.957}) tw(st, {Color = wt, Transparency = 0.92}) end)
 		f.MouseButton1Down:Connect(function() tw(f, {BackgroundColor3 = c.ac, BackgroundTransparency = 0.85}, TweenInfo.new(0.05)) end)
 		f.MouseButton1Up:Connect(function() tw(f, {BackgroundColor3 = uis.MouseEnabled and c.ac or wt, BackgroundTransparency = uis.MouseEnabled and 0.93 or 0.957}) end)
 	end
-
 	local function bx(p, w)
 		local b = bt({AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, 0, 0.5, 0), Size = UDim2.fromOffset(w or 150, 28), BackgroundColor3 = wt, BackgroundTransparency = 0.937, Parent = p}, {rc(8), sk(0.81, c.ac)})
 		return b, b:FindFirstChildOfClass("UIStroke")
@@ -414,7 +228,7 @@ local function loadMainScript()
 		local sc = mk("UIScale", {Parent = mn})
 		local shl = mk("Frame", {Name = "Shell", AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromScale(1, 1), BackgroundColor3 = c.sh, BackgroundTransparency = 0.88, BorderSizePixel = 0, Parent = mn}, {rc(24), mk("UIStroke", {Color = wt, Thickness = 1.4}, {mk("UIGradient", {Rotation = 60, Color = ColorSequence.new({ColorSequenceKeypoint.new(0, wt), ColorSequenceKeypoint.new(0.35, wt), ColorSequenceKeypoint.new(0.65, c.ac), ColorSequenceKeypoint.new(1, c.hi)}), Transparency = ns({0, 0, 0.35, 0.81, 0.65, 0.87, 1, 0.13})})})})
 		local bks = {}
-		for i, a in {{0, 0}, {1, 0}, {0, 1}, {1, 1}} do
+		for i, a in ipairs({{0, 0}, {1, 0}, {0, 1}, {1, 1}}) do
 			local x, y = a[1], a[2]
 			local f = mk("Frame", {AnchorPoint = Vector2.new(x, y), Position = UDim2.new(x, x == 0 and -6 or 6, y, y == 0 and -6 or 6), Size = UDim2.fromOffset(20, 20), BackgroundTransparency = 1, ZIndex = 3, Name = "Bk" .. i, Parent = mn})
 			mk("Frame", {AnchorPoint = Vector2.new(x, y), Position = UDim2.fromScale(x, y), Size = UDim2.fromOffset(20, 2), BackgroundColor3 = c.ac, BorderSizePixel = 0, ZIndex = 3, Parent = f})
@@ -451,7 +265,6 @@ local function loadMainScript()
 			n = n or {}
 			if n.Title == nil and n.Text == nil then error("Notify Failed: No Text", 0) end
 			local t = n.Time == nil and 4 or n.Time
-			if type(t) ~= "number" or t ~= t or t <= 0 then error("Notify Failed: Bad Time", 0) end
 			local f = mk("Frame", {Size = UDim2.new(1, 0, 0, 0), AutomaticSize = Enum.AutomaticSize.Y, BackgroundColor3 = c.cr, BackgroundTransparency = 0.08, BorderSizePixel = 0, ZIndex = 100, Parent = tsf}, {rc(12), sk(0.6, n.Error and c.er or c.ac), pd(20, 14, 10, 10)})
 			mk("Frame", {Position = UDim2.fromOffset(-12, 2), Size = UDim2.new(0, 3, 1, -4), BackgroundColor3 = n.Error and c.er or c.ac, BorderSizePixel = 0, ZIndex = 101, Parent = f}, {rc(2)})
 			local ly = mk("Frame", {Size = UDim2.new(1, 0, 0, 0), AutomaticSize = Enum.AutomaticSize.Y, BackgroundTransparency = 1, ZIndex = 101, Parent = f}, {ll(2)})
@@ -481,10 +294,7 @@ local function loadMainScript()
 		local function save()
 			if not cp or not dirty then return end
 			dirty = false
-			pcall(function()
-				mkd(cp)
-				writefile(cp, hs:JSONEncode(cd))
-			end)
+			pcall(function() mkd(cp) writefile(cp, hs:JSONEncode(cd)) end)
 		end
 
 		local function put(e, v)
@@ -503,10 +313,7 @@ local function loadMainScript()
 			L.Flags[e.Flag] = e:Get()
 			local s = cd[e.Flag]
 			if s == nil then return end
-			pcall(function()
-				if e.ld then s = e.ld(s) end
-				e:Set(s)
-			end)
+			pcall(function() if e.ld then s = e.ld(s) end e:Set(s) end)
 		end
 
 		local nv = mk("Frame", {Name = "Nav", Position = UDim2.fromOffset(12, th), Size = UDim2.new(0, nw, 1, -(th + 12)), BackgroundColor3 = wt, BackgroundTransparency = 0.969, BorderSizePixel = 0, Parent = cr}, {rc(14), pd(6, 6, 6, 6)})
@@ -520,7 +327,7 @@ local function loadMainScript()
 		local fl = bt({Name = "Float", Size = UDim2.fromOffset(44, 44), BackgroundColor3 = c.cr, BackgroundTransparency = 0.15, Parent = sg}, {rc(22), sk(0.45, c.ac)})
 		local fr, fa, fq = rx(fl, 26)
 		fr.AnchorPoint, fr.Position = Vector2.new(0.5, 0.5), UDim2.fromScale(0.5, 0.5)
-		for _, x in fr:GetDescendants() do if x:IsA("GuiObject") then x.Active = false end end
+		for _, x in ipairs(fr:GetDescendants()) do if x:IsA("GuiObject") then x.Active = false end end
 
 		local function fx()
 			W.sv = fit(sg, mn, sc)
@@ -536,7 +343,7 @@ local function loadMainScript()
 
 		local hr = mk("Frame", {AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.new(1, -65, 1, -55), Size = UDim2.fromOffset(250, 250), BackgroundTransparency = 1, Parent = bgh})
 		local hl, pt = {}, {}
-		for _, d in {{236, 1, 0.55, {0, 0, 0.3, 0, 0.31, 1, 0.45, 1, 0.46, 0, 1, 0}, 20}, {214, 5, 0.78, {0, 0, 0.6, 0, 0.61, 1, 1, 1}, -12}, {176, 2, 0.6, {0, 1, 0.2, 1, 0.21, 0, 0.5, 0, 0.51, 1, 0.75, 1, 0.76, 0, 1, 0}, -40}, {128, 1, 0.65}, {100, 3, 0.55, {0, 0, 0.25, 0, 0.26, 1, 1, 1}, 72}} do
+		for _, d in ipairs({{236, 1, 0.55, {0, 0, 0.3, 0, 0.31, 1, 0.45, 1, 0.46, 0, 1, 0}, 20}, {214, 5, 0.78, {0, 0, 0.6, 0, 0.61, 1, 1, 1}, -12}, {176, 2, 0.6, {0, 1, 0.2, 1, 0.21, 0, 0.5, 0, 0.51, 1, 0.75, 1, 0.76, 0, 1, 0}, -40}, {128, 1, 0.65}, {100, 3, 0.55, {0, 0, 0.25, 0, 0.26, 1, 1, 1}, 72}}) do
 			local r = rg(d[1], d[2], c.ac, d[3], d[4])
 			r.Parent = hr
 			if d[5] then hl[#hl + 1] = {r, d[5]} end
@@ -552,21 +359,21 @@ local function loadMainScript()
 		local s0, b0 = 3, 0
 
 		local function hb(dt)
-			for _, x in {{ra, 164}, {rb, -90}, {fa, 164}, {fq, -90}} do x[1].Rotation = (x[1].Rotation + x[2] * dt) % 360 end
+			for _, x in ipairs({{ra, 164}, {rb, -90}, {fa, 164}, {fq, -90}}) do x[1].Rotation = (x[1].Rotation + x[2] * dt) % 360 end
 			if W.fx == "Full" then
-				for _, x in hl do x[1].Rotation = (x[1].Rotation + x[2] * dt) % 360 end
-				for _, q in pt do
-					q.t += dt / q.d
+				for _, x in ipairs(hl) do x[1].Rotation = (x[1].Rotation + x[2] * dt) % 360 end
+				for _, q in ipairs(pt) do
+					q.t = q.t + (dt / q.d)
 					if q.t >= 1 then q.t, q.x, q.y, q.d = 0, math.random(), 0.6 + math.random() * 0.45, 5 + math.random() * 7 end
 					q.f.Position, q.f.BackgroundTransparency = UDim2.new(q.x, 0, q.y, -q.t * 260), 1 - (q.t < 0.15 and q.t / 0.15 or (1 - q.t) / 0.85) * 0.8
 				end
 			end
-			s0 += dt
+			s0 = s0 + dt
 			if s0 >= (W.fx == "Full" and 6 or 12) then
 				s0, sgd.Offset = 0, Vector2.new(-1, 0)
 				tw(sgd, {Offset = Vector2.new(1, 0)}, TweenInfo.new(1.3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut))
 			end
-			b0 += dt
+			b0 = b0 + dt
 			if W.on and b0 >= 0.7 then
 				b0, W.bk = 0, not W.bk
 				sst("ONLINE", W.bk and 0.65 or 0)
@@ -577,7 +384,7 @@ local function loadMainScript()
 			local on = mn.Visible and W.fx ~= "Off" and not dead
 			if on and not W.hc then W.hc = ru.Heartbeat:Connect(hb) elseif not on and W.hc then W.hc:Disconnect(); W.hc = false end
 			hr.Visible = W.fx == "Full"
-			for _, q in pt do q.f.Visible = W.fx == "Full" end
+			for _, q in ipairs(pt) do q.f.Visible = W.fx == "Full" end
 			if W.fx == "Off" and W.on then sst("ONLINE") end
 		end
 
@@ -610,23 +417,13 @@ local function loadMainScript()
 
 		local function glt(p)
 			if W.fx == "Off" then return end
-			for i, q in {{4, 52, 62}, {-3, 59, 53}, {0, 56, 58}} do
+			for i, q in ipairs({{4, 52, 62}, {-3, 59, 53}, {0, 56, 58}}) do
 				task.delay((i - 1) * 0.09, function()
 					p.Position = UDim2.fromOffset(q[1], 0)
 					t1.Position, t2.Position = UDim2.fromOffset(q[2], 8), UDim2.fromOffset(q[3], 8)
 				end)
 			end
-			for i, e in W.Current.Rows do scn(e.Row, 0.05 + (i - 1) * 0.06) end
-		end
-
-		local function ty(ls, sp, g)
-			local n = utf8.len(ls[1].Text) or #ls[1].Text
-			for i = 0, n do
-				if dead or W.ag ~= g then return end
-				for _, l in ls do l.MaxVisibleGraphemes = i end
-				task.wait(sp)
-			end
-			for _, l in ls do l.MaxVisibleGraphemes = -1 end
+			for i, e in ipairs(W.Current.Rows) do scn(e.Row, 0.05 + (i - 1) * 0.06) end
 		end
 
 		local t0 = TweenInfo.new(0)
@@ -636,63 +433,25 @@ local function loadMainScript()
 			return W.ln
 		end
 
-		local function whole()
+		function W:Show()
+			W.ag = W.ag + 1
+			W.op = true
+			mn.Visible = true
+			sc.Scale = W.sv
+			W.up()
+			
 			if W.ln then W.ln:Destroy(); W.ln = false end
-			tw(shl, {Size = UDim2.fromScale(1, 1)}, t0)
+			shl.Size = UDim2.fromScale(1, 1)
 			cr.Visible = true
-			for _, b in bks do
+			for _, b in ipairs(bks) do
 				b[1].Visible = true
-				tw(b[1], {Position = b[2]}, t0)
+				tw(b[1], {Position = b[2]}, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out))
 			end
-			for _, l in {tt, t1, t2, sbt} do l.MaxVisibleGraphemes = -1 end
-			for _, T in W.Tabs do tw(T.nm, {TextTransparency = 0}, t0) end
+			for _, l in ipairs({tt, t1, t2, sbt}) do l.MaxVisibleGraphemes = -1 end
+			for _, T in ipairs(W.Tabs) do tw(T.nm, {TextTransparency = 0}, TweenInfo.new(0.3)) end
 			ind.Visible = W.Current ~= nil
 			W.on = true
 			sst("ONLINE")
-		end
-
-		local function boot(g)
-			local k = W.fx == "Light" and 0.4 or 1
-			W.on = false
-			sst("BOOT")
-			local ln = lnf(0)
-			tw(shl, {Size = UDim2.new(1, 0, 0, 2)}, t0)
-			cr.Visible = false
-			for _, b in bks do
-				b[1].Visible = false
-				tw(b[1], {Position = b[3]}, t0)
-			end
-			for _, l in {tt, t1, t2, sbt} do l.MaxVisibleGraphemes = 0 end
-			task.spawn(function()
-				local function z(s) task.wait(s * k); return dead or W.ag ~= g end
-				tw(ln, {Size = UDim2.new(1, 0, 0, 2)}, TweenInfo.new(0.35 * k, Enum.EasingStyle.Quad, Enum.EasingDirection.Out))
-				if z(0.35) then return end
-				tw(ln, {BackgroundTransparency = 1}, TweenInfo.new(0.4 * k))
-				tw(shl, {Size = UDim2.fromScale(1, 1)}, TweenInfo.new(0.45 * k, Enum.EasingStyle.Quint, Enum.EasingDirection.Out))
-				if z(0.4) then return end
-				for _, T in W.Tabs do tw(T.nm, {TextTransparency = 1}, t0) end
-				ind.Visible = false
-				for _, s in {0.06, 0.05, 0.07, 0.04, 0.08, 0.05} do
-					cr.Visible = not cr.Visible
-					if z(s) then return end
-				end
-				cr.Visible = true
-				if W.ln == ln then ln:Destroy(); W.ln = false end
-				for _, b in bks do
-					b[1].Visible = true
-					tw(b[1], {Position = b[2]}, TweenInfo.new(0.45 * k, Enum.EasingStyle.Back, Enum.EasingDirection.Out))
-				end
-				task.spawn(ty, {tt, t1, t2}, 0.055 * k, g)
-				task.delay(0.4 * k, ty, {sbt}, 0.022 * k, g)
-				if z(0.25) then return end
-				for i, T in W.Tabs do task.delay((i - 1) * 0.07 * k, function() if W.ag == g then tw(T.nm, {TextTransparency = 0}) end end) end
-				if z(0.2) then return end
-				ind.Visible = W.Current ~= nil
-				for i, e in W.Current and W.Current.Rows or {} do scn(e.Row, (i - 1) * 0.08 * k) end
-				if z(0.6) then return end
-				W.on = true
-				sst("ONLINE")
-			end)
 		end
 
 		local function fold(g)
@@ -700,50 +459,59 @@ local function loadMainScript()
 			local function z(s) task.wait(s * k); return dead or W.ag ~= g end
 			W.on = false
 			sst("OFFLINE")
-			for _, b in bks do tw(b[1], {Position = b[3]}, TweenInfo.new(0.2 * k, Enum.EasingStyle.Quad, Enum.EasingDirection.In)) end
+			for _, b in ipairs(bks) do tw(b[1], {Position = b[3]}, TweenInfo.new(0.2 * k, Enum.EasingStyle.Quad, Enum.EasingDirection.In)) end
 			if z(0.15) then return end
-			for _, b in bks do b[1].Visible = false end
-			for _, s in {0.04, 0.05, 0.03, 0.05} do
+			for _, b in ipairs(bks) do b[1].Visible = false end
+			for _, s in ipairs({0.04, 0.05, 0.03, 0.05}) do
 				cr.Visible = not cr.Visible
 				if z(s) then return end
 			end
 			cr.Visible = false
-			local ln = lnf(1)
 			tw(shl, {Size = UDim2.new(1, 0, 0, 2)}, TweenInfo.new(0.25 * k, Enum.EasingStyle.Quint, Enum.EasingDirection.In))
 			if z(0.25) then return end
-			tw(ln, {Size = UDim2.new(0, 0, 0, 2)}, TweenInfo.new(0.2 * k, Enum.EasingStyle.Quad, Enum.EasingDirection.In))
-			if z(0.2) then return end
-			if W.ln == ln then ln:Destroy(); W.ln = false end
 			mn.Visible = false
 			W.up()
-		end
-
-		local function an2() return W.ba and W.fx ~= "Off" end
-
-		function W:Show()
-			W.ag += 1
-			W.op, mn.Visible, sc.Scale = true, true, W.sv
-			W.up()
-			if an2() then boot(W.ag) else whole() end
 		end
 
 		function W:Hide()
-			W.ag += 1
+			W.ag = W.ag + 1
 			W.op = false
-			if an2() and mn.Visible then task.spawn(fold, W.ag); return end
-			whole()
-			mn.Visible = false
-			W.up()
+			task.spawn(fold, W.ag)
 		end
 
 		local function tg() if W.op then W:Hide() else W:Show() end end
 		fl.Activated:Connect(tg)
 		nb.Activated:Connect(function() W:Hide() end)
 
+		local logoDragger
+		fl.InputBegan:Connect(function(i)
+			if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+				local startPos = fl.Position
+				local startInput = i.Position
+				logoDragger = {
+					i = i,
+					move = function(inputPos)
+						local delta = inputPos - startInput
+						fl.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+					end
+				}
+			end
+		end)
+		UserInputService.InputChanged:Connect(function(i)
+			if logoDragger and (i.UserInputType == Enum.UserInputType.MouseMovement or i == logoDragger.i) then
+				logoDragger.move(i.Position)
+			end
+		end)
+		UserInputService.InputEnded:Connect(function(i)
+			if logoDragger and (i == logoDragger.i or i.UserInputType == Enum.UserInputType.MouseButton1) then
+				logoDragger = nil
+			end
+		end)
+
 		local arm, an = false, 0
 		xb.Activated:Connect(function()
 			if arm then (W :: any):Destroy(); return end
-			arm, an = true, an + 1
+			arm = true; an = an + 1
 			local n = an
 			tw(xb, {BackgroundColor3 = c.er, BackgroundTransparency = 0})
 			xi.TextColor3 = wt
@@ -803,15 +571,13 @@ local function loadMainScript()
 			if not W.Current then T:Select() end
 
 			local function add(e)
-				T.n += 1
+				T.n = T.n + 1
 				e.Row.LayoutOrder = T.n
 				table.insert(T.Rows, e)
 				return e
 			end
 
 			local function row(k, r)
-				if type(r.Name) ~= "string" then error(`{k} Failed: Bad Name`, 0) end
-				if r.Flag ~= nil and type(r.Flag) ~= "string" then error(`{k} Failed: Bad Flag`, 0) end
 				local f = bt({Size = UDim2.new(1, 0, 0, 40), BackgroundColor3 = wt, BackgroundTransparency = 0.957, ClipsDescendants = true, Parent = p}, {rc(12), sk(0.92), pd(14, 14)})
 				hv(f, f:FindFirstChildOfClass("UIStroke"))
 				local l = tl({Text = r.Name, FontFace = fs, Size = UDim2.new(0.5, 0, 1, 0), TextTruncate = Enum.TextTruncate.AtEnd, Parent = f})
@@ -851,10 +617,7 @@ local function loadMainScript()
 				r = r or {}
 				local e, f, l = row("Button", r)
 				ig({Text = "chevron-small-right", TextColor3 = c.a2, AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, 0, 0, 0), Size = UDim2.fromOffset(16, 40), Parent = f})
-				f.Activated:Connect(function()
-					fl2(f)
-					run(r.Callback)
-				end)
+				f.Activated:Connect(function() fl2(f) run(r.Callback) end)
 				return txt(e, l)
 			end
 
@@ -868,7 +631,7 @@ local function loadMainScript()
 					local on = e.v
 					local q = {sw, {BackgroundColor3 = on and c.ac or wt, BackgroundTransparency = on and 0 or 0.84}, kn, {Position = UDim2.new(0, on and 22 or 2, 0.5, 0), BackgroundColor3 = on and wt or hx("D6E6EE")}}
 					for i = 1, #q, 2 do
-						if a then tw(q[i], q[i + 1], i == 3 and tb2 or ti) else for k, v in q[i + 1] do q[i][k] = v end end
+						if a then tw(q[i], q[i + 1], i == 3 and tb2 or ti) else for k, v in pairs(q[i + 1]) do q[i][k] = v end end
 					end
 				end
 				draw(false)
@@ -892,8 +655,6 @@ local function loadMainScript()
 			function T:Slider(r)
 				r = r or {}
 				local lo, hi, st = tonumber(r.Min), tonumber(r.Max), r.Step == nil and 1 or tonumber(r.Step)
-				if not (lo and hi and hi > lo) then error("Slider Failed: Bad Range", 0) end
-				if not (st and st > 0) then error("Slider Failed: Bad Step", 0) end
 				local e, f = row("Slider", r)
 				local vl = mk("TextBox", {BackgroundTransparency = 1, Text = "", FontFace = fj, TextSize = 12, TextColor3 = c.a2, AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, 0, 0, 0), Size = UDim2.fromOffset(40, 40), TextXAlignment = Enum.TextXAlignment.Right, ClearTextOnFocus = false, Parent = f})
 				local hit = bt({AnchorPoint = Vector2.new(1, 0.5), Position = UDim2.new(1, -52, 0.5, 0), Size = UDim2.fromOffset(110, 28), Parent = f})
@@ -909,7 +670,6 @@ local function loadMainScript()
 				end
 				draw()
 				function e:Set(v)
-					if type(v) ~= "number" or v ~= v then error("Slider Set Failed: Not A Number", 0) end
 					v = q(v)
 					if v == e.v then return end
 					e.v = v
@@ -935,14 +695,13 @@ local function loadMainScript()
 
 			function T:Dropdown(r)
 				r = r or {}
-				if type(r.Options) ~= "table" then error("Dropdown Failed: Bad Options", 0) end
 				local e, f = row("Dropdown", r)
 				local mu = r.Multi == true
 				e.Options = {}
 				local function opts(l)
 					local seen = {}
 					e.Options = {}
-					for _, s in l do
+					for _, s in ipairs(l) do
 						if type(s) == "string" and not seen[s] then seen[s] = true; table.insert(e.Options, s) end
 					end
 				end
@@ -952,22 +711,22 @@ local function loadMainScript()
 				local ch = ig({Text = "chevron-small-down", TextColor3 = c.a2, AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -6, 0, 0), Size = UDim2.fromOffset(16, 28), Parent = box})
 				local function norm(v)
 					if mu then
-						if type(v) ~= "table" then error("Dropdown Set Failed: Not A Table", 0) end
+						if type(v) ~= "table" then return {} end
 						local wn, out = {}, {}
-						for _, s in v do wn[s] = true end
-						for _, s in e.Options do
+						for _, s in ipairs(v) do wn[s] = true end
+						for _, s in ipairs(e.Options) do
 							if wn[s] then table.insert(out, s) end
 						end
 						return out
 					end
 					if v == nil then return nil end
 					if table.find(e.Options, v) then return v end
-					error("Dropdown Set Failed: Unknown Option", 0)
+					return nil
 				end
 				local function same(a, b)
 					if not mu then return a == b end
 					if #a ~= #b then return false end
-					for i, s in a do if b[i] ~= s then return false end end
+					for i, s in ipairs(a) do if b[i] ~= s then return false end end
 					return true
 				end
 				e.v = if mu then (if type(r.Default) == "table" then norm(r.Default) else {}) else (if table.find(e.Options, r.Default) then r.Default else nil)
@@ -991,7 +750,6 @@ local function loadMainScript()
 					emit(v)
 				end
 				function e:Refresh(l)
-					if type(l) ~= "table" then error("Dropdown Refresh Failed: Bad Options", 0) end
 					opts(l)
 					local v = mu and norm(e.v) or (table.find(e.Options, e.v) and e.v or nil)
 					if not same(v, e.v) then emit(v) end
@@ -1014,7 +772,7 @@ local function loadMainScript()
 					fy = mk("Frame", {Position = UDim2.fromOffset(bp.X, y), Size = UDim2.fromOffset(box.AbsoluteSize.X / s, h), BackgroundColor3 = c.cr, BackgroundTransparency = 0.05, BorderSizePixel = 0, Parent = ov}, {rc(10), sk(0.6, c.ac), pd(4, 4, 4, 4)})
 					local ls = mk("ScrollingFrame", {Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, BorderSizePixel = 0, ScrollBarThickness = 2, ScrollBarImageColor3 = c.a2, AutomaticCanvasSize = Enum.AutomaticSize.Y, CanvasSize = UDim2.new(), ScrollingDirection = Enum.ScrollingDirection.Y, Parent = fy}, {ll(0)})
 					if #e.Options == 0 then tl({Text = "No Options", TextSize = 12, TextColor3 = c.dm, Position = UDim2.fromOffset(10, 0), Size = UDim2.new(1, -10, 0, 30), Parent = ls}) end
-					for n, s in e.Options do
+					for n, s in ipairs(e.Options) do
 						local sl = has(s)
 						local b = bt({Size = UDim2.new(1, 0, 0, 30), BackgroundColor3 = c.ac, BackgroundTransparency = sl and 0.8 or 1, LayoutOrder = n, Parent = ls}, {rc(6)})
 						tl({Text = s, FontFace = fs, TextSize = 12, Position = UDim2.fromOffset(10, 0), Size = UDim2.new(1, -36, 1, 0), TextTruncate = Enum.TextTruncate.AtEnd, Parent = b})
@@ -1109,30 +867,24 @@ local function loadMainScript()
 				done(e)
 				return e
 			end
-
 			return T
 		end
 
 		function W:Interface(T_arg)
 			local sec = T_arg:Section({Name = T("InterfaceSec")})
 			RegT(sec, "InterfaceSec", "Section")
-			
 			local drop = T_arg:Dropdown({Name = T("Effects"), Options = {"Full", "Light", "Off"}, Default = W.fx, Flag = "fx", Callback = function(v) W:Effects(v or "Full") end})
 			RegT(drop, "Effects", "Normal")
-			
 			local slide = T_arg:Slider({Name = T("GlassDensity"), Min = 40, Max = 95, Step = 1, Default = math.round(W.gd * 100), Flag = "gd", Callback = function(v)
 				W.gd = v / 100
 				cr.BackgroundTransparency = 1 - W.gd
 			end})
 			RegT(slide, "GlassDensity", "Normal")
-			
-			local tog = T_arg:Toggle({Name = T("BootAnim"), Default = W.ba, Flag = "ba", Callback = function(v) W.ba = v end})
-			RegT(tog, "BootAnim", "Normal")
 		end
 
 		function W:Destroy()
 			dead = true
-			for _, x in W.cn do x:Disconnect() end
+			for _, x in ipairs(W.cn) do x:Disconnect() end
 			W.cn = {}
 			if W.hc then W.hc:Disconnect(); W.hc = false end
 			save()
@@ -1140,18 +892,12 @@ local function loadMainScript()
 			if ge.__BkW == W then ge.__BkW = nil end
 		end
 
-		if an2() then boot(W.ag) else whole() end
-		W.up()
+		W:Show()
 		ge.__BkW = W
 		return W
 	end
 
-	local W = L:Window({
-		Title = T("Title"),
-		Subtitle = "Throw Food For Animals V1.2",
-		Config = `Setting_{LocalPlayer.Name}`
-	})
-
+	local W = L:Window({Title = T("Title"), Subtitle = "Throw Food For Animals V1.2", Config = `Setting_{LocalPlayer.Name}`})
 	local tabMain = W:Tab({Name = T("MainTab")})
 	RegT(tabMain, "MainTab", "Tab")
 	local tabEvent = W:Tab({Name = T("EventTab")})
@@ -1159,16 +905,10 @@ local function loadMainScript()
 	local tabSettings = W:Tab({Name = T("SettingsTab")})
 	RegT(tabSettings, "SettingsTab", "Tab")
 
-	-- Đặt Language lên trên cùng của Tab Settings
 	local secLang = tabSettings:Section({Name = T("LangSec")})
 	RegT(secLang, "LangSec", "Section")
-
 	local ddLang = tabSettings:Dropdown({
-		Name = T("SelectLang"),
-		Options = {"English", "Vietnamese"},
-		Multi = false,
-		Default = currentLang,
-		Flag = "SelectedLanguage",
+		Name = T("SelectLang"), Options = {"English", "Vietnamese"}, Multi = false, Default = currentLang, Flag = "SelectedLanguage",
 		Callback = function(v)
 			if v and v ~= currentLang then
 				currentLang = v
@@ -1179,8 +919,6 @@ local function loadMainScript()
 		end
 	})
 	RegT(ddLang, "SelectLang", "Normal")
-
-	-- Sau đó đến Interface (Effects, Glass Density, Boot Anim)
 	W:Interface(tabSettings)
 
 	local function findController(name)
@@ -1191,9 +929,7 @@ local function loadMainScript()
 				local controllers = root:FindFirstChild("Controllers", true)
 				if controllers then
 					local module = controllers:FindFirstChild(name, true)
-					if module and module:IsA("ModuleScript") then
-						return module
-					end
+					if module and module:IsA("ModuleScript") then return module end
 				end
 			end
 		end
@@ -1236,31 +972,10 @@ local function loadMainScript()
 	local RingRushConfig = safeRequire(ReplicatedStorage:WaitForChild("Config"):FindFirstChild("RingRushConfig"))
 	local RingRushCourse = safeRequire(ReplicatedStorage:WaitForChild("Shared"):FindFirstChild("RingRushCourse"))
 
-	local RarityList = {
-		"Common", "Uncommon", "Rare", "Epic", "Legendary", 
-		"Mythic", "Secret", "Divine", "Celestial", "Eternal", "Cosmic", "Supreme"
-	}
+	local RarityList = {"Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic", "Secret", "Divine", "Celestial", "Eternal", "Cosmic", "Supreme"}
+	local MutationList = {"None", "Gold", "Diamond", "Emerald", "Ruby", "Rainbow", "Champion"}
 
-	local MutationList = {
-		"None", "Gold", "Diamond", "Emerald", "Ruby", "Rainbow", "Champion"
-	}
-
-	local configState = {
-		AutoThrow = false,
-		AutoTrain = false,
-		AutoUpgradeStand = false,
-		AutoUpgradeFence = false,
-		AutoBuyFood = false,
-		AutoSellPet = false,
-		SellRarities = {"Common", "Uncommon"},
-		SellMutations = {"None"},
-		AutoEquip = false,
-		AutoRingRush = false,
-		MaxRingsPerRun = 150,
-		AntiAFK = true,
-		Running = true
-	}
-
+	local configState = {AutoThrow = false, AutoTrain = false, AutoUpgradeStand = false, AutoUpgradeFence = false, AutoBuyFood = false, AutoSellPet = false, SellRarities = {"Common", "Uncommon"}, SellMutations = {"None"}, AutoEquip = false, AutoRingRush = false, MaxRingsPerRun = 150, AntiAFK = true, Running = true}
 	local busy = { action = false }
 
 	LocalPlayer.Idled:Connect(function()
@@ -1277,9 +992,7 @@ local function loadMainScript()
 			local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 			if hrp then hrp.Anchored = false end
 			local clientState = safeRequire(findController("ClientState"))
-			if clientState and (clientState.Busy == "Throw" or clientState.Busy == "Training") then
-				clientState.Busy = nil
-			end
+			if clientState and (clientState.Busy == "Throw" or clientState.Busy == "Training") then clientState.Busy = nil end
 			busy.action = false
 		end)
 	end
@@ -1290,15 +1003,11 @@ local function loadMainScript()
 			pcall(function()
 				local dataCtrl = DataController or safeRequire(findController("DataController"))
 				local offlineEarnings = safeRequire(findController("OfflineEarnings"))
-				
 				if dataCtrl and offlineEarnings then
 					local pending = tonumber(dataCtrl:GetPath("OfflinePending.Base")) or 0
 					if pending > 0 then
-						if type(offlineEarnings.Claim) == "function" then
-							offlineEarnings.Claim()
-						else
-							RemotesModule.Invoke("Offline_Claim")
-						end
+						if type(offlineEarnings.Claim) == "function" then offlineEarnings.Claim()
+						else RemotesModule.Invoke("Offline_Claim") end
 						W:Notify({Title = T("Title"), Text = T("NotifClaimed"), Time = 4})
 						task.wait(5)
 					end
@@ -1307,170 +1016,59 @@ local function loadMainScript()
 		end
 	end)
 
-	-- [[ UI - MAIN TAB ]] --
 	local secThrow = tabMain:Section({Name = T("ThrowSec")})
 	RegT(secThrow, "ThrowSec", "Section")
-
-	local togThrow = tabMain:Toggle({
-		Name = T("AutoThrow"),
-		Default = false,
-		Flag = "AutoThrow",
-		Callback = function(v) 
-			configState.AutoThrow = v 
-			if not v then resetMovementLock() end
-		end
-	})
+	local togThrow = tabMain:Toggle({Name = T("AutoThrow"), Default = false, Flag = "AutoThrow", Callback = function(v) configState.AutoThrow = v if not v then resetMovementLock() end end})
 	RegT(togThrow, "AutoThrow", "Normal")
 
 	local secTrain = tabMain:Section({Name = T("TrainSec")})
 	RegT(secTrain, "TrainSec", "Section")
-
-	local togTrain = tabMain:Toggle({
-		Name = T("AutoTrain"),
-		Default = false,
-		Flag = "AutoTrain",
-		Callback = function(v)
-			configState.AutoTrain = v
-			if not v then
-				pcall(function()
-					if TrainingController and type(TrainingController.Stop) == "function" then
-						TrainingController.Stop(true)
-					end
-				end)
-				resetMovementLock()
-			end
-		end
-	})
+	local togTrain = tabMain:Toggle({Name = T("AutoTrain"), Default = false, Flag = "AutoTrain", Callback = function(v) configState.AutoTrain = v if not v then pcall(function() if TrainingController and type(TrainingController.Stop) == "function" then TrainingController.Stop(true) end end) resetMovementLock() end end})
 	RegT(togTrain, "AutoTrain", "Normal")
-
-	local togUpStand = tabMain:Toggle({
-		Name = T("AutoUpStand"),
-		Default = false,
-		Flag = "AutoUpgradeStand",
-		Callback = function(v) configState.AutoUpgradeStand = v end
-	})
+	local togUpStand = tabMain:Toggle({Name = T("AutoUpStand"), Default = false, Flag = "AutoUpgradeStand", Callback = function(v) configState.AutoUpgradeStand = v end})
 	RegT(togUpStand, "AutoUpStand", "Normal")
 
 	local secPet = tabMain:Section({Name = T("PetSec")})
 	RegT(secPet, "PetSec", "Section")
-
-	local togSellPets = tabMain:Toggle({
-		Name = T("AutoSellPets"),
-		Default = false,
-		Flag = "AutoSellPet",
-		Callback = function(v) configState.AutoSellPet = v end
-	})
+	local togSellPets = tabMain:Toggle({Name = T("AutoSellPets"), Default = false, Flag = "AutoSellPet", Callback = function(v) configState.AutoSellPet = v end})
 	RegT(togSellPets, "AutoSellPets", "Normal")
-
-	local ddRarities = tabMain:Dropdown({
-		Name = T("FilterRarities"),
-		Options = RarityList,
-		Multi = true,
-		Default = {"Common", "Uncommon"},
-		Flag = "SellRarities",
-		Callback = function(v) configState.SellRarities = v or {} end
-	})
+	local ddRarities = tabMain:Dropdown({Name = T("FilterRarities"), Options = RarityList, Multi = true, Default = {"Common", "Uncommon"}, Flag = "SellRarities", Callback = function(v) configState.SellRarities = v or {} end})
 	RegT(ddRarities, "FilterRarities", "Normal")
-
-	local ddMutations = tabMain:Dropdown({
-		Name = T("FilterMutations"),
-		Options = MutationList,
-		Multi = true,
-		Default = {"None"},
-		Flag = "SellMutations",
-		Callback = function(v) configState.SellMutations = v or {} end
-	})
+	local ddMutations = tabMain:Dropdown({Name = T("FilterMutations"), Options = MutationList, Multi = true, Default = {"None"}, Flag = "SellMutations", Callback = function(v) configState.SellMutations = v or {} end})
 	RegT(ddMutations, "FilterMutations", "Normal")
 
 	local secPlot = tabMain:Section({Name = T("PlotSec")})
 	RegT(secPlot, "PlotSec", "Section")
-
-	local togUpFence = tabMain:Toggle({
-		Name = T("AutoUpFence"),
-		Default = false,
-		Flag = "AutoUpgradeFence",
-		Callback = function(v) configState.AutoUpgradeFence = v end
-	})
+	local togUpFence = tabMain:Toggle({Name = T("AutoUpFence"), Default = false, Flag = "AutoUpgradeFence", Callback = function(v) configState.AutoUpgradeFence = v end})
 	RegT(togUpFence, "AutoUpFence", "Normal")
-
-	local togBuyFood = tabMain:Toggle({
-		Name = T("AutoBuyFood"),
-		Default = false,
-		Flag = "AutoBuyFood",
-		Callback = function(v) configState.AutoBuyFood = v end
-	})
+	local togBuyFood = tabMain:Toggle({Name = T("AutoBuyFood"), Default = false, Flag = "AutoBuyFood", Callback = function(v) configState.AutoBuyFood = v end})
 	RegT(togBuyFood, "AutoBuyFood", "Normal")
-
-	local togEquipBest = tabMain:Toggle({
-		Name = T("AutoEquipBest"),
-		Default = false,
-		Flag = "AutoEquip",
-		Callback = function(v) configState.AutoEquip = v end
-	})
+	local togEquipBest = tabMain:Toggle({Name = T("AutoEquipBest"), Default = false, Flag = "AutoEquip", Callback = function(v) configState.AutoEquip = v end})
 	RegT(togEquipBest, "AutoEquipBest", "Normal")
 
-	-- [[ UI - EVENT TAB ]] --
 	local secRingRush = tabEvent:Section({Name = T("RingRushSec")})
 	RegT(secRingRush, "RingRushSec", "Section")
-
 	local eventStatusLabel = tabEvent:Label({ Text = T("StatusEventWait") })
-
-	local togRingRush = tabEvent:Toggle({
-		Name = T("AutoRingRush"),
-		Default = false,
-		Flag = "AutoRingRush",
-		Callback = function(v) 
-			configState.AutoRingRush = v 
-			if not v then resetMovementLock() end
-		end
-	})
+	local togRingRush = tabEvent:Toggle({Name = T("AutoRingRush"), Default = false, Flag = "AutoRingRush", Callback = function(v) configState.AutoRingRush = v if not v then resetMovementLock() end end})
 	RegT(togRingRush, "AutoRingRush", "Normal")
-
-	local sldMaxRings = tabEvent:Slider({
-		Name = T("MaxRings"),
-		Min = 20,
-		Max = 300,
-		Step = 10,
-		Default = 150,
-		Flag = "MaxRingsPerRun",
-		Callback = function(v) configState.MaxRingsPerRun = v end
-	})
+	local sldMaxRings = tabEvent:Slider({Name = T("MaxRings"), Min = 20, Max = 300, Step = 10, Default = 150, Flag = "MaxRingsPerRun", Callback = function(v) configState.MaxRingsPerRun = v end})
 	RegT(sldMaxRings, "MaxRings", "Normal")
 
-	-- [[ UI - SETTINGS TAB TIẾP TỤC ]] --
 	local secUtil = tabSettings:Section({Name = T("UtilSec")})
 	RegT(secUtil, "UtilSec", "Section")
-
-	local togAntiAFK = tabSettings:Toggle({
-		Name = T("AntiAFK"),
-		Default = true,
-		Flag = "AntiAFK",
-		Callback = function(v)
-			configState.AntiAFK = v
-		end
-	})
+	local togAntiAFK = tabSettings:Toggle({Name = T("AntiAFK"), Default = true, Flag = "AntiAFK", Callback = function(v) configState.AntiAFK = v end})
 	RegT(togAntiAFK, "AntiAFK", "Normal")
 
 	local secTrouble = tabSettings:Section({Name = T("TroubleSec")})
 	RegT(secTrouble, "TroubleSec", "Section")
-
-	local btnFixMove = tabSettings:Button({
-		Name = T("FixMovement"),
-		Callback = function()
-			resetMovementLock()
-			W:Notify({Title = T("Title"), Text = T("NotifFix"), Time = 3})
-		end
-	})
+	local btnFixMove = tabSettings:Button({Name = T("FixMovement"), Callback = function() resetMovementLock() W:Notify({Title = T("Title"), Text = T("NotifFix"), Time = 3}) end})
 	RegT(btnFixMove, "FixMovement", "Normal")
 
-	-- ================= POSITION & GAMEPLAY FUNCTIONS =================
 	local function getBestLaunchPosition()
 		local starterArea = workspace:FindFirstChild("StarterArea")
 		if starterArea then
 			local crossLine = starterArea:FindFirstChild("CrossLine")
-			if crossLine then
-				return crossLine.Position + Vector3.new(0, 3, 2)
-			end
+			if crossLine then return crossLine.Position + Vector3.new(0, 3, 2) end
 			return starterArea.Position + Vector3.new(0, 4, 0)
 		end
 		return nil
@@ -1481,13 +1079,10 @@ local function loadMainScript()
 			local ok, upvs = pcall(getupvalues, TrainingController.BindSpot)
 			if ok and type(upvs) == "table" then
 				for _, val in pairs(upvs) do
-					if typeof(val) == "Instance" and val:IsA("BasePart") then
-						return val.Position + Vector3.new(0, 3, 0)
-					end
+					if typeof(val) == "Instance" and val:IsA("BasePart") then return val.Position + Vector3.new(0, 3, 0) end
 				end
 			end
 		end
-
 		local plotIndex = LocalPlayer:GetAttribute("PlotIndex")
 		if plotIndex and workspace:FindFirstChild("Plots") then
 			local myPlot = workspace.Plots:FindFirstChild(tostring(plotIndex))
@@ -1497,9 +1092,7 @@ local function loadMainScript()
 					for _, obj in ipairs(serverFolder:GetChildren()) do
 						if obj.Name:find("Stand") or obj.Name:find("Rig") or obj:FindFirstChild("BarPosition") then
 							local part = obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
-							if part then
-								return part.Position + Vector3.new(0, 3, 0)
-							end
+							if part then return part.Position + Vector3.new(0, 3, 0) end
 						end
 					end
 				end
@@ -1513,7 +1106,6 @@ local function loadMainScript()
 		if not character or not targetPos then return end
 		local hrp = character:FindFirstChild("HumanoidRootPart")
 		if not hrp then return end
-
 		hrp.Anchored = false
 		character:PivotTo(CFrame.new(targetPos))
 		hrp.AssemblyLinearVelocity = Vector3.zero
@@ -1524,9 +1116,7 @@ local function loadMainScript()
 	local function getPetRarity(modelName)
 		if AnimalEconomy and type(AnimalEconomy.Get) == "function" then
 			local data = AnimalEconomy.Get(modelName)
-			if data and data.Rarity then
-				return data.Rarity
-			end
+			if data and data.Rarity then return data.Rarity end
 		end
 		return "Common"
 	end
@@ -1550,11 +1140,8 @@ local function loadMainScript()
 			pcall(function()
 				local evName = RingRushConfig and RingRushConfig.EventName or "RingRush"
 				local stage = workspace:GetAttribute("LiveEventStage_" .. evName)
-				if isRingRushActive() then
-					eventStatusLabel:Set(T("StatusEventActive") .. " (" .. tostring(stage or "Flight") .. ")")
-				else
-					eventStatusLabel:Set(T("StatusEventWait"))
-				end
+				if isRingRushActive() then eventStatusLabel:Set(T("StatusEventActive") .. " (" .. tostring(stage or "Flight") .. ")")
+				else eventStatusLabel:Set(T("StatusEventWait")) end
 			end)
 		end
 	end)
@@ -1587,10 +1174,8 @@ local function loadMainScript()
 			local dt = (ring.Distance - prevDist) / speed + 0.025
 			task.wait(dt)
 			elapsed = elapsed + dt
-
 			local targetOffset = course:GetRingOffset(ring, elapsed)
 			local rep = RemotesModule.Invoke("RingRush_Report", ringIdx, true, targetOffset.X, targetOffset.Y, elapsed)
-
 			passes = passes + 1
 			prevDist = ring.Distance
 			if not rep or not rep.Ok or rep.Ended then break end
@@ -1607,9 +1192,7 @@ local function loadMainScript()
 		if configState.AutoTrain and descendant.Name == "TapBonus" and descendant:IsA("GuiButton") then
 			task.wait(0.08)
 			if firesignal then pcall(firesignal, descendant.Activated) end
-			for _, conn in ipairs(getconnections and getconnections(descendant.Activated) or {}) do
-				pcall(conn.Fire, conn)
-			end
+			for _, conn in ipairs(getconnections and getconnections(descendant.Activated) or {}) do pcall(conn.Fire, conn) end
 		end
 	end)
 
@@ -1636,10 +1219,7 @@ local function loadMainScript()
 						local petMutation = pet.Mutation or "None"
 						if table.find(configState.SellRarities, petRarity) and table.find(configState.SellMutations, petMutation) then
 							local sellRes = RemotesModule.Invoke("Plot_SellAnimal", id)
-							if sellRes and sellRes.Ok then
-								executedSomething = true
-								task.wait(0.15)
-							end
+							if sellRes and sellRes.Ok then executedSomething = true task.wait(0.15) end
 						end
 					end
 				end
@@ -1647,41 +1227,82 @@ local function loadMainScript()
 		end
 
 		if configState.AutoBuyFood then
-			local count = (FoodsConfig and ((type(FoodsConfig.CountAll) == "function" and FoodsConfig.CountAll()) or (type(FoodsConfig.Count) == "function" and FoodsConfig.Count()))) or 30
+			local count = 0
+			pcall(function() count = FoodsConfig.CountAll() end)
+			if count == 0 then pcall(function() count = FoodsConfig.Count() end) end
+			if count == 0 then count = 50 end
+			
+			local BalanceCurve = safeRequire(ReplicatedStorage:FindFirstChild("Shared") and ReplicatedStorage.Shared:FindFirstChild("BalanceCurve"))
+			
+			local currentlyEquipped = 1
+			pcall(function() currentlyEquipped = dataCtrl:Get("EquippedFood") or 1 end)
+			
+			local bestOwned = 1
+
 			for i = 1, count do
-				local isOwned = type(dataCtrl.GetPath) == "function" and dataCtrl:GetPath("OwnedFoods." .. i) == true
-				local isLocked = FoodsConfig and type(FoodsConfig.IsLocked) == "function" and FoodsConfig.IsLocked(i)
-				if not isOwned and not isLocked then
-					local foodData = FoodsConfig and (type(FoodsConfig.GetAny) == "function" and FoodsConfig.GetAny(i) or FoodsConfig.Get(i))
-					local price = foodData and foodData.Price or 0
-					if currentMoney >= price then
-						local buyRes = RemotesModule.Invoke("Shop_Buy", i)
-						if buyRes and buyRes.Ok then
-							currentMoney = currentMoney - price
-							task.wait(0.15)
-							RemotesModule.Invoke("Shop_Equip", i)
-							executedSomething = true
+				if not configState.AutoBuyFood then break end
+
+				local isLocked = false
+				pcall(function() isLocked = FoodsConfig.IsLocked(i) end)
+				
+				if not isLocked then
+					local isOwned = false
+					pcall(function() isOwned = (dataCtrl:GetPath("OwnedFoods." .. i) == true) end)
+
+					if isOwned then
+						bestOwned = i
+					else
+						local foodData = nil
+						pcall(function() foodData = FoodsConfig.GetAny(i) or FoodsConfig.Get(i) end)
+
+						if foodData then
+							local price = foodData.Price or 0
+							if BalanceCurve and type(BalanceCurve.GetItemPrice) == "function" then
+								pcall(function() price = BalanceCurve.GetItemPrice(LocalPlayer, foodData) end)
+							end
+
+							if currentMoney >= price then
+								local buyRes = nil
+								pcall(function() buyRes = RemotesModule.Invoke("Shop_Buy", i) end)
+								
+								if buyRes and buyRes.Ok then
+									currentMoney = currentMoney - price
+									bestOwned = i
+									executedSomething = true
+									task.wait(0.1)
+								else
+									break 
+								end
+							else
+								break 
+							end
+						else
+							break
 						end
 					end
 				end
 			end
+
+			-- Trang bị Food tốt nhất
+			if bestOwned > currentlyEquipped then
+				pcall(function() RemotesModule.Invoke("Shop_Equip", bestOwned) end)
+				executedSomething = true
+			end
 		end
 
 		if configState.AutoUpgradeStand then
-			local currentStand = dataCtrl:Get("Stand") or 0
+			local currentStand = 0
+			pcall(function() currentStand = dataCtrl:Get("Stand") or 0 end)
 			local nextStand = StandsConfig and StandsConfig.Get(currentStand + 1)
 			if nextStand and currentMoney >= nextStand.Price then
 				local res = RemotesModule.Invoke("Stand_Upgrade")
-				if res and res.Ok then
-					currentMoney = currentMoney - nextStand.Price
-					executedSomething = true
-					task.wait(0.2)
-				end
+				if res and res.Ok then currentMoney = currentMoney - nextStand.Price executedSomething = true task.wait(0.2) end
 			end
 		end
 
 		if configState.AutoUpgradeFence then
-			local currentFence = dataCtrl:Get("FenceLevel") or 0
+			local currentFence = 0
+			pcall(function() currentFence = dataCtrl:Get("FenceLevel") or 0 end)
 			local nextFence = FenceConfig and FenceConfig.Get(currentFence + 1)
 			if nextFence and currentMoney >= nextFence.Price then
 				local res = RemotesModule.Invoke("Plot_UpgradeFence")
@@ -1697,35 +1318,24 @@ local function loadMainScript()
 							safeTeleport(char, signPos)
 							task.wait(0.2)
 							local retry = RemotesModule.Invoke("Plot_UpgradeFence")
-							if retry and retry.Ok then
-								currentMoney = currentMoney - nextFence.Price
-								executedSomething = true
-							end
+							if retry and retry.Ok then currentMoney = currentMoney - nextFence.Price executedSomething = true end
 						end
 					end
-				elseif res and res.Ok then
-					currentMoney = currentMoney - nextFence.Price
-					executedSomething = true
-					task.wait(0.2)
-				end
+				elseif res and res.Ok then currentMoney = currentMoney - nextFence.Price executedSomething = true task.wait(0.2) end
 			end
 		end
 
 		return executedSomething
 	end
 
-	-- Vòng lặp chính
 	task.spawn(function()
 		while task.wait(0.3) do
 			if not configState.Running then break end
-
 			local clientState = ClientStateModule or safeRequire(findController("ClientState"))
 			local character = LocalPlayer.Character
 
 			if not configState.AutoThrow and not configState.AutoTrain and not configState.AutoRingRush then
-				if not busy.action then
-					resetMovementLock()
-				end
+				if not busy.action then resetMovementLock() end
 			end
 
 			if not busy.action then
@@ -1749,13 +1359,9 @@ local function loadMainScript()
 				elseif configState.AutoThrow then
 					busy.action = true
 					clientState.Busy = "Throw"
-
 					local launchPos = getBestLaunchPosition()
 					local hrp = character and character:FindFirstChild("HumanoidRootPart")
-					if character and launchPos then 
-						safeTeleport(character, launchPos) 
-						if hrp then hrp.Anchored = true end
-					end
+					if character and launchPos then safeTeleport(character, launchPos) if hrp then hrp.Anchored = true end end
 
 					local startRes = RemotesModule.Invoke("Throw_Start")
 					if startRes and startRes.Ok then
@@ -1766,25 +1372,13 @@ local function loadMainScript()
 							local supRes = RemotesModule.Invoke("Throw_UseSuper")
 							if supRes and supRes.Ok then usedSuper = true end
 						end
-
-						local fakeMeterResult = {
-							Power = 1,
-							Perfect = true,
-							SuperThrow = usedSuper,
-							Saved = startRes.Saved
-						}
-
+						local fakeMeterResult = { Power = 1, Perfect = true, SuperThrow = usedSuper, Saved = startRes.Saved }
 						local resolveRes = RemotesModule.Invoke("Throw_Resolve", fakeMeterResult)
-						if resolveRes and resolveRes.Ok then
-							task.wait(0.5)
-							RemotesModule.Invoke("Throw_Complete")
-						else
-							RemotesModule.Invoke("Throw_Cancel")
-						end
+						if resolveRes and resolveRes.Ok then task.wait(0.5) RemotesModule.Invoke("Throw_Complete")
+						else RemotesModule.Invoke("Throw_Cancel") end
 					end
 
 					if not configState.AutoThrow and hrp then hrp.Anchored = false end
-
 					clientState.Busy = nil
 					busy.action = false
 					task.wait(1.2)
@@ -1799,30 +1393,20 @@ local function loadMainScript()
 							safeTeleport(character, trainSpot)
 							task.wait(0.2)
 						end
-
-						if TrainingController and type(TrainingController.Start) == "function" then
-							pcall(TrainingController.Start)
-						else
-							pcall(function() RemotesModule.Invoke("Training_Start") end)
-						end
+						if TrainingController and type(TrainingController.Start) == "function" then pcall(TrainingController.Start) else pcall(function() RemotesModule.Invoke("Training_Start") end) end
 						busy.action = false
 					else
 						local dataCtrl = DataController or safeRequire(findController("DataController"))
 						local money = dataCtrl and dataCtrl:Get("Money") or 0
-						local currentStand = dataCtrl and dataCtrl:Get("Stand") or 0
+						local currentStand = 0
+						pcall(function() currentStand = dataCtrl:Get("Stand") or 0 end)
 						local nextStand = StandsConfig and StandsConfig.Get(currentStand + 1)
-						local currentFence = dataCtrl and dataCtrl:Get("FenceLevel") or 0
+						local currentFence = 0
+						pcall(function() currentFence = dataCtrl:Get("FenceLevel") or 0 end)
 						local nextFence = FenceConfig and FenceConfig.Get(currentFence + 1)
-
-						local shouldInterrupt = (configState.AutoUpgradeStand and nextStand and money >= nextStand.Price)
-							or (configState.AutoUpgradeFence and nextFence and money >= nextFence.Price)
-
+						local shouldInterrupt = (configState.AutoUpgradeStand and nextStand and money >= nextStand.Price) or (configState.AutoUpgradeFence and nextFence and money >= nextFence.Price)
 						if shouldInterrupt then
-							if TrainingController and type(TrainingController.Stop) == "function" then
-								pcall(TrainingController.Stop, true)
-							else
-								pcall(function() RemotesModule.Invoke("Training_Stop") end)
-							end
+							if TrainingController and type(TrainingController.Stop) == "function" then pcall(TrainingController.Stop, true) else pcall(function() RemotesModule.Invoke("Training_Stop") end) end
 							task.wait(0.3)
 							checkAndExecutePriority()
 						end
@@ -1835,18 +1419,12 @@ local function loadMainScript()
 	task.spawn(function()
 		while task.wait(3) do
 			if not configState.Running then break end
-			if configState.AutoEquip and not busy.action then
-				pcall(function() EquipBestRemote:InvokeServer() end)
-			end
+			if configState.AutoEquip and not busy.action then pcall(function() EquipBestRemote:InvokeServer() end) end
 		end
 	end)
 
 	W:Notify({Title = T("Title"), Text = T("NotifLoaded"), Time = 4})
 end
-
--- ==============================================================================
--- GIAO DIỆN KIỂM TRA KEY (KEY CARD UI) - MULTI LANGUAGE
--- ==============================================================================
 
 local keyGui = Instance.new("ScreenGui")
 keyGui.Name = "BaKhiKeySystem_" .. HttpService:GenerateGUID(false):sub(1, 8)
@@ -1854,25 +1432,11 @@ keyGui.ResetOnSpawn = false
 keyGui.IgnoreGuiInset = true
 keyGui.DisplayOrder = 999999
 
-pcall(function()
-	keyGui.Parent = (gethui and gethui()) or CoreGui
-end)
-if not keyGui.Parent then
-	keyGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
-end
+pcall(function() keyGui.Parent = (gethui and gethui()) or CoreGui end)
+if not keyGui.Parent then keyGui.Parent = LocalPlayer:WaitForChild("PlayerGui") end
 
 local hx = Color3.fromHex
-local c = {
-	cr = hx("07101C"),
-	sh = hx("8CDCFF"),
-	ac = hx("4FD8FF"),
-	a2 = hx("8FE3FF"),
-	dm = hx("9FC6D6"),
-	ok = hx("7DFFB0"),
-	er = hx("FF5A6A"),
-	wt = Color3.new(1, 1, 1)
-}
-
+local c = { cr = hx("07101C"), sh = hx("8CDCFF"), ac = hx("4FD8FF"), a2 = hx("8FE3FF"), dm = hx("9FC6D6"), ok = hx("7DFFB0"), er = hx("FF5A6A"), wt = Color3.new(1, 1, 1) }
 local bs = "rbxasset://fonts/families/BuilderSans.json"
 local fn = Font.new(bs, Enum.FontWeight.Medium)
 local fs = Font.new(bs, Enum.FontWeight.SemiBold)
@@ -1889,154 +1453,37 @@ mainBox.BackgroundTransparency = 0.08
 mainBox.BorderSizePixel = 0
 mainBox.ClipsDescendants = true
 mainBox.Parent = keyGui
+local corner = Instance.new("UICorner") corner.CornerRadius = UDim.new(0, 18) corner.Parent = mainBox
+local stroke = Instance.new("UIStroke") stroke.Thickness = 1.4 stroke.Color = c.ac stroke.Transparency = 0.25 stroke.Parent = mainBox
 
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 18)
-corner.Parent = mainBox
-
-local stroke = Instance.new("UIStroke")
-stroke.Thickness = 1.4
-stroke.Color = c.ac
-stroke.Transparency = 0.25
-stroke.Parent = mainBox
-
-local title = Instance.new("TextLabel")
-title.Text = T("Title")
-title.FontFace = fm
-title.TextSize = 16
-title.TextColor3 = c.wt
-title.Position = UDim2.fromOffset(24, 18)
-title.Size = UDim2.fromOffset(200, 20)
-title.BackgroundTransparency = 1
-title.TextXAlignment = Enum.TextXAlignment.Left
-title.Parent = mainBox
-
-local subTitle = Instance.new("TextLabel")
-subTitle.Text = T("SubTitle")
-subTitle.FontFace = fj
-subTitle.TextSize = 10
-subTitle.TextColor3 = c.a2
-subTitle.Position = UDim2.fromOffset(24, 38)
-subTitle.Size = UDim2.fromOffset(200, 14)
-subTitle.BackgroundTransparency = 1
-subTitle.TextXAlignment = Enum.TextXAlignment.Left
-subTitle.Parent = mainBox
-
-local statusLabel = Instance.new("TextLabel")
-statusLabel.Name = "Status"
-statusLabel.Text = T("StatusCheck")
-statusLabel.FontFace = fn
-statusLabel.TextSize = 12
-statusLabel.TextColor3 = c.a2
-statusLabel.Position = UDim2.fromOffset(24, 70)
-statusLabel.Size = UDim2.new(1, -48, 0, 18)
-statusLabel.BackgroundTransparency = 1
-statusLabel.TextXAlignment = Enum.TextXAlignment.Left
-statusLabel.Parent = mainBox
-
-local inputContainer = Instance.new("Frame")
-inputContainer.Position = UDim2.fromOffset(24, 98)
-inputContainer.Size = UDim2.new(1, -48, 0, 42)
-inputContainer.BackgroundColor3 = Color3.fromRGB(15, 26, 42)
-inputContainer.BorderSizePixel = 0
-inputContainer.Parent = mainBox
-
-local inputCorner = Instance.new("UICorner")
-inputCorner.CornerRadius = UDim.new(0, 10)
-inputCorner.Parent = inputContainer
-
-local inputStroke = Instance.new("UIStroke")
-inputStroke.Thickness = 1
-inputStroke.Color = c.ac
-inputStroke.Transparency = 0.7
-inputStroke.Parent = inputContainer
+local title = Instance.new("TextLabel") title.Text = T("Title") title.FontFace = fm title.TextSize = 16 title.TextColor3 = c.wt title.Position = UDim2.fromOffset(24, 18) title.Size = UDim2.fromOffset(200, 20) title.BackgroundTransparency = 1 title.TextXAlignment = Enum.TextXAlignment.Left title.Parent = mainBox
+local subTitle = Instance.new("TextLabel") subTitle.Text = T("SubTitle") subTitle.FontFace = fj subTitle.TextSize = 10 subTitle.TextColor3 = c.a2 subTitle.Position = UDim2.fromOffset(24, 38) subTitle.Size = UDim2.fromOffset(200, 14) subTitle.BackgroundTransparency = 1 subTitle.TextXAlignment = Enum.TextXAlignment.Left subTitle.Parent = mainBox
+local statusLabel = Instance.new("TextLabel") statusLabel.Name = "Status" statusLabel.Text = T("StatusCheck") statusLabel.FontFace = fn statusLabel.TextSize = 12 statusLabel.TextColor3 = c.a2 statusLabel.Position = UDim2.fromOffset(24, 70) statusLabel.Size = UDim2.new(1, -48, 0, 18) statusLabel.BackgroundTransparency = 1 statusLabel.TextXAlignment = Enum.TextXAlignment.Left statusLabel.Parent = mainBox
+local inputContainer = Instance.new("Frame") inputContainer.Position = UDim2.fromOffset(24, 98) inputContainer.Size = UDim2.new(1, -48, 0, 42) inputContainer.BackgroundColor3 = Color3.fromRGB(15, 26, 42) inputContainer.BorderSizePixel = 0 inputContainer.Parent = mainBox
+local inputCorner = Instance.new("UICorner") inputCorner.CornerRadius = UDim.new(0, 10) inputCorner.Parent = inputContainer
+local inputStroke = Instance.new("UIStroke") inputStroke.Thickness = 1 inputStroke.Color = c.ac inputStroke.Transparency = 0.7 inputStroke.Parent = inputContainer
 
 local keyInput = Instance.new("TextBox")
-keyInput.Position = UDim2.fromOffset(12, 0)
-keyInput.Size = UDim2.new(1, -24, 1, 0)
-keyInput.BackgroundTransparency = 1
-keyInput.ClearTextOnFocus = false
-keyInput.FontFace = fs
-keyInput.PlaceholderText = T("Placeholder")
-keyInput.PlaceholderColor3 = Color3.fromRGB(90, 115, 140)
-keyInput.Text = ""
-keyInput.TextColor3 = c.wt
-keyInput.TextSize = 13
-keyInput.TextXAlignment = Enum.TextXAlignment.Left
-keyInput.Parent = inputContainer
-
-keyInput.Focused:Connect(function()
-	TweenService:Create(inputStroke, TweenInfo.new(0.2), { Transparency = 0, Color = c.ac }):Play()
-end)
-
-keyInput.FocusLost:Connect(function()
-	TweenService:Create(inputStroke, TweenInfo.new(0.2), { Transparency = 0.7, Color = c.ac }):Play()
-end)
+keyInput.Position = UDim2.fromOffset(12, 0) keyInput.Size = UDim2.new(1, -24, 1, 0) keyInput.BackgroundTransparency = 1 keyInput.ClearTextOnFocus = false keyInput.FontFace = fs keyInput.PlaceholderText = T("Placeholder") keyInput.PlaceholderColor3 = Color3.fromRGB(90, 115, 140) keyInput.Text = "" keyInput.TextColor3 = c.wt keyInput.TextSize = 13 keyInput.TextXAlignment = Enum.TextXAlignment.Left keyInput.Parent = inputContainer
+keyInput.Focused:Connect(function() TweenService:Create(inputStroke, TweenInfo.new(0.2), { Transparency = 0, Color = c.ac }):Play() end)
+keyInput.FocusLost:Connect(function() TweenService:Create(inputStroke, TweenInfo.new(0.2), { Transparency = 0.7, Color = c.ac }):Play() end)
 
 local submitBtn = Instance.new("TextButton")
-submitBtn.Position = UDim2.fromOffset(24, 156)
-submitBtn.Size = UDim2.new(0.62, -30, 0, 42)
-submitBtn.BackgroundColor3 = c.ac
-submitBtn.AutoButtonColor = false
-submitBtn.FontFace = fs
-submitBtn.Text = T("BtnChecking")
-submitBtn.TextColor3 = c.cr
-submitBtn.TextSize = 13
-submitBtn.Parent = mainBox
-
-local submitCorner = Instance.new("UICorner")
-submitCorner.CornerRadius = UDim.new(0, 10)
-submitCorner.Parent = submitBtn
+submitBtn.Position = UDim2.fromOffset(24, 156) submitBtn.Size = UDim2.new(0.62, -30, 0, 42) submitBtn.BackgroundColor3 = c.ac submitBtn.AutoButtonColor = false submitBtn.FontFace = fs submitBtn.Text = T("BtnChecking") submitBtn.TextColor3 = c.cr submitBtn.TextSize = 13 submitBtn.Parent = mainBox
+local submitCorner = Instance.new("UICorner") submitCorner.CornerRadius = UDim.new(0, 10) submitCorner.Parent = submitBtn
 
 local getKeyBtn = Instance.new("TextButton")
-getKeyBtn.Position = UDim2.new(0.66, 0, 0, 156)
-getKeyBtn.Size = UDim2.new(0.34, -24, 0, 42)
-getKeyBtn.BackgroundColor3 = Color3.fromRGB(20, 36, 56)
-getKeyBtn.AutoButtonColor = false
-getKeyBtn.FontFace = fs
-getKeyBtn.Text = T("BtnGetKey")
-getKeyBtn.TextColor3 = c.a2
-getKeyBtn.TextSize = 13
-getKeyBtn.Parent = mainBox
-
-local getKeyCorner = Instance.new("UICorner")
-getKeyCorner.CornerRadius = UDim.new(0, 10)
-getKeyCorner.Parent = getKeyBtn
-
-local getKeyStroke = Instance.new("UIStroke")
-getKeyStroke.Thickness = 1
-getKeyStroke.Color = c.ac
-getKeyStroke.Transparency = 0.6
-getKeyStroke.Parent = getKeyBtn
+getKeyBtn.Position = UDim2.new(0.66, 0, 0, 156) getKeyBtn.Size = UDim2.new(0.34, -24, 0, 42) getKeyBtn.BackgroundColor3 = Color3.fromRGB(20, 36, 56) getKeyBtn.AutoButtonColor = false getKeyBtn.FontFace = fs getKeyBtn.Text = T("BtnGetKey") getKeyBtn.TextColor3 = c.a2 getKeyBtn.TextSize = 13 getKeyBtn.Parent = mainBox
+local getKeyCorner = Instance.new("UICorner") getKeyCorner.CornerRadius = UDim.new(0, 10) getKeyCorner.Parent = getKeyBtn
+local getKeyStroke = Instance.new("UIStroke") getKeyStroke.Thickness = 1 getKeyStroke.Color = c.ac getKeyStroke.Transparency = 0.6 getKeyStroke.Parent = getKeyBtn
 
 local discordBtn = Instance.new("TextButton")
-discordBtn.Position = UDim2.fromOffset(24, 208)
-discordBtn.Size = UDim2.new(1, -48, 0, 38)
-discordBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
-discordBtn.AutoButtonColor = false
-discordBtn.FontFace = fs
-discordBtn.Text = T("BtnDiscord")
-discordBtn.TextColor3 = c.wt
-discordBtn.TextSize = 13
-discordBtn.Parent = mainBox
-
-local discordCorner = Instance.new("UICorner")
-discordCorner.CornerRadius = UDim.new(0, 10)
-discordCorner.Parent = discordBtn
+discordBtn.Position = UDim2.fromOffset(24, 208) discordBtn.Size = UDim2.new(1, -48, 0, 38) discordBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242) discordBtn.AutoButtonColor = false discordBtn.FontFace = fs discordBtn.Text = T("BtnDiscord") discordBtn.TextColor3 = c.wt discordBtn.TextSize = 13 discordBtn.Parent = mainBox
+local discordCorner = Instance.new("UICorner") discordCorner.CornerRadius = UDim.new(0, 10) discordCorner.Parent = discordBtn
 
 local closeBtn = Instance.new("TextButton")
-closeBtn.Position = UDim2.new(1, -38, 0, 14)
-closeBtn.Size = UDim2.fromOffset(24, 24)
-closeBtn.BackgroundTransparency = 1
-closeBtn.Text = "X"
-closeBtn.FontFace = fs
-closeBtn.TextColor3 = c.dm
-closeBtn.TextSize = 14
-closeBtn.Parent = mainBox
-
-closeBtn.Activated:Connect(function()
-	keyGui:Destroy()
-end)
+closeBtn.Position = UDim2.new(1, -38, 0, 14) closeBtn.Size = UDim2.fromOffset(24, 24) closeBtn.BackgroundTransparency = 1 closeBtn.Text = "X" closeBtn.FontFace = fs closeBtn.TextColor3 = c.dm closeBtn.TextSize = 14 closeBtn.Parent = mainBox
+closeBtn.Activated:Connect(function() keyGui:Destroy() end)
 
 submitBtn.MouseEnter:Connect(function() TweenService:Create(submitBtn, TweenInfo.new(0.15), { BackgroundColor3 = c.hi }):Play() end)
 submitBtn.MouseLeave:Connect(function() TweenService:Create(submitBtn, TweenInfo.new(0.15), { BackgroundColor3 = c.ac }):Play() end)
@@ -2048,40 +1495,21 @@ discordBtn.MouseLeave:Connect(function() TweenService:Create(discordBtn, TweenIn
 getKeyBtn.Activated:Connect(function()
 	local currentHwid = getHWID()
 	local targetUrl = WORKER_URL .. (currentHwid ~= "" and ("?hwid=" .. currentHwid) or "")
-	
-	if setclipboard or toclipboard then
-		pcall(function() (setclipboard or toclipboard)(targetUrl) end)
-		statusLabel.Text = T("StatusCopiedWorker")
-		statusLabel.TextColor3 = c.ok
-	else
-		statusLabel.Text = "Link: " .. targetUrl
-		statusLabel.TextColor3 = c.a2
-	end
+	if setclipboard or toclipboard then pcall(function() (setclipboard or toclipboard)(targetUrl) end) statusLabel.Text = T("StatusCopiedWorker") statusLabel.TextColor3 = c.ok
+	else statusLabel.Text = "Link: " .. targetUrl statusLabel.TextColor3 = c.a2 end
 end)
 
 discordBtn.Activated:Connect(function()
-	if setclipboard or toclipboard then
-		pcall(function() (setclipboard or toclipboard)(DISCORD_LINK) end)
-		statusLabel.Text = T("StatusCopiedDiscord")
-		statusLabel.TextColor3 = c.ok
-	else
-		statusLabel.Text = "Discord: " .. DISCORD_LINK
-		statusLabel.TextColor3 = c.a2
-	end
+	if setclipboard or toclipboard then pcall(function() (setclipboard or toclipboard)(DISCORD_LINK) end) statusLabel.Text = T("StatusCopiedDiscord") statusLabel.TextColor3 = c.ok
+	else statusLabel.Text = "Discord: " .. DISCORD_LINK statusLabel.TextColor3 = c.a2 end
 end)
 
 local function validateAndProceed(entered, isAuto)
 	if not entered or entered == "" then
-		statusLabel.Text = T("StatusEmpty")
-		statusLabel.TextColor3 = c.er
-		submitBtn.Text = T("BtnSubmit")
+		statusLabel.Text = T("StatusEmpty") statusLabel.TextColor3 = c.er submitBtn.Text = T("BtnSubmit")
 		return
 	end
-
-	statusLabel.Text = T("StatusCheck")
-	statusLabel.TextColor3 = c.a2
-	submitBtn.Text = T("BtnChecking")
-
+	statusLabel.Text = T("StatusCheck") statusLabel.TextColor3 = c.a2 submitBtn.Text = T("BtnChecking")
 	task.spawn(function()
 		local isValid, dataOrError = validateKey(entered)
 		if isValid then
@@ -2090,56 +1518,34 @@ local function validateAndProceed(entered, isAuto)
 				local expireDate = os.date("%H:%M:%S - %d/%m/%Y", math.floor(dataOrError / 1000))
 				expireMsg = " (Expires: " .. expireDate .. ")"
 			end
-			statusLabel.Text = T("StatusSuccess") .. expireMsg
-			statusLabel.TextColor3 = c.ok
-			submitBtn.Text = T("BtnSuccess")
-
+			statusLabel.Text = T("StatusSuccess") .. expireMsg statusLabel.TextColor3 = c.ok submitBtn.Text = T("BtnSuccess")
 			pcall(function()
 				if writefile then
 					if not isfolder("BaKhi") then makefolder("BaKhi") end
 					writefile(KEY_PATH, string.upper(entered):gsub("%s+", ""))
 				end
 			end)
-
 			task.wait(1.2)
 			TweenService:Create(mainBox, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), { Size = UDim2.fromOffset(0, 0) }):Play()
 			task.wait(0.35)
 			keyGui:Destroy()
-
 			loadMainScript()
-		elseif dataOrError == "expired" then
-			statusLabel.Text = T("StatusExpired")
-			statusLabel.TextColor3 = c.er
-			submitBtn.Text = T("BtnExpired")
-		elseif dataOrError == "empty" then
-			statusLabel.Text = T("StatusEmpty")
-			statusLabel.TextColor3 = c.er
-			submitBtn.Text = T("BtnSubmit")
-		else
-			statusLabel.Text = T("StatusInvalid")
-			statusLabel.TextColor3 = c.er
-			submitBtn.Text = T("BtnRetry")
-		end
+		elseif dataOrError == "expired" then statusLabel.Text = T("StatusExpired") statusLabel.TextColor3 = c.er submitBtn.Text = T("BtnExpired")
+		elseif dataOrError == "empty" then statusLabel.Text = T("StatusEmpty") statusLabel.TextColor3 = c.er submitBtn.Text = T("BtnSubmit")
+		else statusLabel.Text = T("StatusInvalid") statusLabel.TextColor3 = c.er submitBtn.Text = T("BtnRetry") end
 	end)
 end
 
-submitBtn.Activated:Connect(function()
-	validateAndProceed(keyInput.Text, false)
-end)
+submitBtn.Activated:Connect(function() validateAndProceed(keyInput.Text, false) end)
 
 if isfile and isfile(KEY_PATH) then
 	local savedKey = readfile(KEY_PATH)
 	if savedKey and savedKey ~= "" then
 		keyInput.Text = savedKey
-		task.spawn(function()
-			task.wait(0.5)
-			validateAndProceed(savedKey, true)
-		end)
+		task.spawn(function() task.wait(0.5) validateAndProceed(savedKey, true) end)
 	else
-		statusLabel.Text = T("StatusWait")
-		submitBtn.Text = T("BtnSubmit")
+		statusLabel.Text = T("StatusWait") submitBtn.Text = T("BtnSubmit")
 	end
 else
-	statusLabel.Text = T("StatusWait")
-	submitBtn.Text = T("BtnSubmit")
+	statusLabel.Text = T("StatusWait") submitBtn.Text = T("BtnSubmit")
 end
