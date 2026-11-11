@@ -1,5 +1,5 @@
 -- ==============================================================================
--- BAKHI HUB - INSTANT LOAD VERSION (NO BOOT ANIMATION) + MULTI-LANGUAGE
+-- BAKHI HUB - FULL ANIMATION VERSION (HIDDEN BOOT) + MULTI-LANGUAGE
 -- THROW FOOD FOR ANIMALS V1.2 (FIXED AUTO BUY & EQUIP FOOD)
 -- ==============================================================================
 
@@ -426,6 +426,16 @@ local function loadMainScript()
 			for i, e in ipairs(W.Current.Rows) do scn(e.Row, 0.05 + (i - 1) * 0.06) end
 		end
 
+		local function ty(ls, sp, g)
+			local n = utf8.len(ls[1].Text) or #ls[1].Text
+			for i = 0, n do
+				if dead or W.ag ~= g then return end
+				for _, l in ipairs(ls) do l.MaxVisibleGraphemes = i end
+				task.wait(sp)
+			end
+			for _, l in ipairs(ls) do l.MaxVisibleGraphemes = -1 end
+		end
+
 		local t0 = TweenInfo.new(0)
 		local function lnf(w)
 			if W.ln then W.ln:Destroy() end
@@ -433,25 +443,63 @@ local function loadMainScript()
 			return W.ln
 		end
 
-		function W:Show()
-			W.ag = W.ag + 1
-			W.op = true
-			mn.Visible = true
-			sc.Scale = W.sv
-			W.up()
-			
+		local function whole()
 			if W.ln then W.ln:Destroy(); W.ln = false end
-			shl.Size = UDim2.fromScale(1, 1)
+			tw(shl, {Size = UDim2.fromScale(1, 1)}, t0)
 			cr.Visible = true
 			for _, b in ipairs(bks) do
 				b[1].Visible = true
-				tw(b[1], {Position = b[2]}, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out))
+				tw(b[1], {Position = b[2]}, t0)
 			end
 			for _, l in ipairs({tt, t1, t2, sbt}) do l.MaxVisibleGraphemes = -1 end
-			for _, T in ipairs(W.Tabs) do tw(T.nm, {TextTransparency = 0}, TweenInfo.new(0.3)) end
+			for _, T in ipairs(W.Tabs) do tw(T.nm, {TextTransparency = 0}, t0) end
 			ind.Visible = W.Current ~= nil
 			W.on = true
 			sst("ONLINE")
+		end
+
+		local function boot(g)
+			local k = W.fx == "Light" and 0.4 or 1
+			W.on = false
+			sst("BOOT")
+			local ln = lnf(0)
+			tw(shl, {Size = UDim2.new(1, 0, 0, 2)}, t0)
+			cr.Visible = false
+			for _, b in ipairs(bks) do
+				b[1].Visible = false
+				tw(b[1], {Position = b[3]}, t0)
+			end
+			for _, l in ipairs({tt, t1, t2, sbt}) do l.MaxVisibleGraphemes = 0 end
+			task.spawn(function()
+				local function z(s) task.wait(s * k); return dead or W.ag ~= g end
+				tw(ln, {Size = UDim2.new(1, 0, 0, 2)}, TweenInfo.new(0.35 * k, Enum.EasingStyle.Quad, Enum.EasingDirection.Out))
+				if z(0.35) then return end
+				tw(ln, {BackgroundTransparency = 1}, TweenInfo.new(0.4 * k))
+				tw(shl, {Size = UDim2.fromScale(1, 1)}, TweenInfo.new(0.45 * k, Enum.EasingStyle.Quint, Enum.EasingDirection.Out))
+				if z(0.4) then return end
+				for _, T in ipairs(W.Tabs) do tw(T.nm, {TextTransparency = 1}, t0) end
+				ind.Visible = false
+				for _, s in ipairs({0.06, 0.05, 0.07, 0.04, 0.08, 0.05}) do
+					cr.Visible = not cr.Visible
+					if z(s) then return end
+				end
+				cr.Visible = true
+				if W.ln == ln then ln:Destroy(); W.ln = false end
+				for _, b in ipairs(bks) do
+					b[1].Visible = true
+					tw(b[1], {Position = b[2]}, TweenInfo.new(0.45 * k, Enum.EasingStyle.Back, Enum.EasingDirection.Out))
+				end
+				task.spawn(ty, {tt, t1, t2}, 0.055 * k, g)
+				task.delay(0.4 * k, ty, {sbt}, 0.022 * k, g)
+				if z(0.25) then return end
+				for i, T in ipairs(W.Tabs) do task.delay((i - 1) * 0.07 * k, function() if W.ag == g then tw(T.nm, {TextTransparency = 0}) end end) end
+				if z(0.2) then return end
+				ind.Visible = W.Current ~= nil
+				for i, e in ipairs(W.Current and W.Current.Rows or {}) do scn(e.Row, (i - 1) * 0.08 * k) end
+				if z(0.6) then return end
+				W.on = true
+				sst("ONLINE")
+			end)
 		end
 
 		local function fold(g)
@@ -467,16 +515,32 @@ local function loadMainScript()
 				if z(s) then return end
 			end
 			cr.Visible = false
+			local ln = lnf(1)
 			tw(shl, {Size = UDim2.new(1, 0, 0, 2)}, TweenInfo.new(0.25 * k, Enum.EasingStyle.Quint, Enum.EasingDirection.In))
 			if z(0.25) then return end
+			tw(ln, {Size = UDim2.new(0, 0, 0, 2)}, TweenInfo.new(0.2 * k, Enum.EasingStyle.Quad, Enum.EasingDirection.In))
+			if z(0.2) then return end
+			if W.ln == ln then ln:Destroy(); W.ln = false end
 			mn.Visible = false
 			W.up()
+		end
+
+		local function an2() return W.ba and W.fx ~= "Off" end
+
+		function W:Show()
+			W.ag = W.ag + 1
+			W.op, mn.Visible, sc.Scale = true, true, W.sv
+			W.up()
+			if an2() then boot(W.ag) else whole() end
 		end
 
 		function W:Hide()
 			W.ag = W.ag + 1
 			W.op = false
-			task.spawn(fold, W.ag)
+			if an2() and mn.Visible then task.spawn(fold, W.ag); return end
+			whole()
+			mn.Visible = false
+			W.up()
 		end
 
 		local function tg() if W.op then W:Hide() else W:Show() end end
@@ -892,7 +956,8 @@ local function loadMainScript()
 			if ge.__BkW == W then ge.__BkW = nil end
 		end
 
-		W:Show()
+		if an2() then boot(W.ag) else whole() end
+		W.up()
 		ge.__BkW = W
 		return W
 	end
@@ -1283,7 +1348,6 @@ local function loadMainScript()
 				end
 			end
 
-			-- Trang bị Food tốt nhất
 			if bestOwned > currentlyEquipped then
 				pcall(function() RemotesModule.Invoke("Shop_Equip", bestOwned) end)
 				executedSomething = true
