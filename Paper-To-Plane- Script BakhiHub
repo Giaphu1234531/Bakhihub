@@ -1049,7 +1049,6 @@ local function rebuildMapCatalog(worldConfig)
 			if wid and not seenIds[wid] then
 				seenIds[wid] = true
 				table.insert(worldIds, wid)
-				local info = type(worldConfig.Get) == "function" and pcall(worldConfig.Get, wid)
 				local dispName = nil
 				if type(worldConfig.Get) == "function" then
 					local okGet, wData = pcall(worldConfig.Get, wid)
@@ -2662,18 +2661,20 @@ local function findPaperSellerNPC(worldId)
 		local bestHrp = nil
 		for _, npc in ipairs(npcsFolder:GetChildren()) do
 			if npc:IsA("Model") then
-				local hrp = npc:FindFirstChild("HumanoidRootPart") or npc.PrimaryPart
+				local hrp = npc:FindFirstChild("HumanoidRootPart") or npc.PrimaryPart or npc:FindFirstChildWhichIsA("BasePart")
 				if hrp then
 					local hasPaperPrompt = false
+					local promptWorld = nil
 					for _, desc in ipairs(npc:GetDescendants()) do
-						if desc:IsA("ProximityPrompt") and desc:GetAttribute("ShowroomTalk") then
+						if desc:IsA("ProximityPrompt") and (desc:GetAttribute("ShowroomTalk") or desc.Name:lower():find("paper") or desc.ActionText:lower():find("paper")) then
 							hasPaperPrompt = true
+							promptWorld = tonumber(desc:GetAttribute("ShopWorld")) or tonumber(desc:GetAttribute("World"))
 							break
 						end
 					end
 
 					if hasPaperPrompt then
-						local npcWorld = tonumber(npc:GetAttribute("ShopWorld")) or tonumber(npc:GetAttribute("World"))
+						local npcWorld = tonumber(npc:GetAttribute("ShopWorld")) or tonumber(npc:GetAttribute("World")) or promptWorld
 						if not npcWorld and gameApi.WorldConfig and type(gameApi.WorldConfig.AtPosition) == "function" then
 							local w = gameApi.WorldConfig.AtPosition(hrp.Position)
 							npcWorld = w and tonumber(w.WorldId)
@@ -2692,7 +2693,7 @@ local function findPaperSellerNPC(worldId)
 			local npcPos = npcCF.Position
 			local lookDir = Vector3.new(npcCF.LookVector.X, 0, npcCF.LookVector.Z)
 			lookDir = if lookDir.Magnitude > 0.05 then lookDir.Unit else Vector3.new(0, 0, 1)
-			local standPos = groundStandPos(character, npcPos + lookDir * 5, npcPos.Y)
+			local standPos = groundStandPos(character, npcPos + lookDir * 5, npcPos.Y + 3)
 			return standPos, npcPos, true
 		end
 	end
@@ -2702,7 +2703,7 @@ local function findPaperSellerNPC(worldId)
 		if shopCfg and shopCfg.Exterior and shopCfg.Exterior.Position then
 			local exteriorPos = shopCfg.Exterior.Position
 			local facing = shopCfg.Exterior.Facing or Vector3.new(0, 0, 1)
-			local standPos = groundStandPos(character, exteriorPos + facing * 5, exteriorPos.Y)
+			local standPos = groundStandPos(character, exteriorPos + facing * 5, exteriorPos.Y + 3)
 			return standPos, exteriorPos, false
 		end
 	end
@@ -2710,7 +2711,7 @@ local function findPaperSellerNPC(worldId)
 	return nil, nil, false
 end
 
-local function safeTeleport(character, standPos, lookTarget)
+local function safeTeleport(character, standPos, lookTarget, snapThreshold)
 	local root = character:FindFirstChild("HumanoidRootPart")
 	if not root then return false end
 
@@ -2718,10 +2719,11 @@ local function safeTeleport(character, standPos, lookTarget)
 		localPlayer:RequestStreamAroundAsync(standPos, 2)
 	end)
 
+	local threshold = snapThreshold or 1.2
 	local flatDist = Vector3.new(root.Position.X - standPos.X, 0, root.Position.Z - standPos.Z).Magnitude
 	local targetLook = Vector3.new(lookTarget.X, standPos.Y, lookTarget.Z)
 
-	if flatDist <= 5 and math.abs(root.Position.Y - standPos.Y) <= 8 then
+	if flatDist <= threshold and math.abs(root.Position.Y - standPos.Y) <= 6 then
 		local lookSameY = Vector3.new(lookTarget.X, root.Position.Y, lookTarget.Z)
 		if (lookSameY - root.Position).Magnitude > 0.1 then
 			root.CFrame = CFrame.lookAt(root.Position, lookSameY)
@@ -2739,7 +2741,6 @@ local function safeTeleport(character, standPos, lookTarget)
 end
 
 local function findNearestFoldingTable(worldId, refPosition)
-	local character = localPlayer.Character
 	local bestTable = nil
 	local bestScore = math.huge
 
@@ -2771,31 +2772,18 @@ local function findNearestFoldingTable(worldId, refPosition)
 		return nil, nil, nil
 	end
 
-	local centerPart = bestTable:FindFirstChild("PaperCenter") or bestTable:FindFirstChild("TablePad")
-	local tableCenter = (centerPart and centerPart.Position) or bestTable:GetPivot().Position
-
-	local seatInfo = gameApi.FoldingSlots and gameApi.FoldingSlots.Seat(bestTable, 1)
-	local chairRefPos = nil
-	if seatInfo and seatInfo.Stand then
-		chairRefPos = seatInfo.Stand.Position
-	elseif bestTable:FindFirstChild("StandPoint") then
-		chairRefPos = bestTable.StandPoint.Position
-	elseif bestTable:FindFirstChild("FoldingPlayerPosition") then
-		chairRefPos = bestTable.FoldingPlayerPosition.Position
-	end
-
-	local outDir
-	if chairRefPos then
-		local flat = Vector3.new(chairRefPos.X - tableCenter.X, 0, chairRefPos.Z - tableCenter.Z)
-		outDir = if flat.Magnitude > 0.05 then flat.Unit else Vector3.new(0, 0, 1)
+	local centerPart = bestTable:FindFirstChild("PaperCenter") or bestTable:FindFirstChild("TablePad") or bestTable:FindFirstChildWhichIsA("BasePart", true)
+	local tableTopY
+	if centerPart and centerPart:IsA("BasePart") then
+		tableTopY = centerPart.Position.Y + (centerPart.Size.Y * 0.5)
 	else
-		outDir = Vector3.new(0, 0, 1)
+		local pivotCF, tableSize = bestTable:GetBoundingBox()
+		tableTopY = pivotCF.Position.Y + (tableSize.Y * 0.5)
 	end
 
-	local basePos = chairRefPos or (tableCenter + outDir * 3.5)
-	local rawStand = basePos + outDir * 3
-	local standPos = groundStandPos(character, rawStand, basePos.Y)
-	local lookTarget = chairRefPos or tableCenter
+	local tableCenter = (centerPart and centerPart:IsA("BasePart") and centerPart.Position) or bestTable:GetPivot().Position
+	local standPos = Vector3.new(tableCenter.X, tableTopY + 3, tableCenter.Z)
+	local lookTarget = Vector3.new(tableCenter.X, standPos.Y, tableCenter.Z) + bestTable:GetPivot().LookVector * 4
 	return bestTable, standPos, lookTarget
 end
 
@@ -2885,12 +2873,53 @@ local function performAutoBuyPhase()
 		return false
 	end
 
+	if gameApi.PaperFoldingConfig and type(gameApi.PaperFoldingConfig.Price) == "function" then
+		local minPrice = math.huge
+		for _, rarity in ipairs(state.buyPaperRarities) do
+			local pKey = toInternalPaperKey(rarity)
+			local okPrice, pVal = pcall(gameApi.PaperFoldingConfig.Price, worldId, pKey)
+			local numPrice = okPrice and tonumber(pVal) or nil
+			if numPrice and numPrice > 0 and numPrice < minPrice then
+				minPrice = numPrice
+			end
+		end
+		if minPrice < math.huge and currentCoins < minPrice then
+			lastBuyCheck.world = worldId
+			lastBuyCheck.cycle = currentCycle
+			lastBuyCheck.coins = currentCoins
+			return false
+		end
+	end
+
+	local okState, shopState = pcall(gameApi.BackendClient.Call, "PaperFolding", "GetShopState", worldId)
+	if okState and type(shopState) == "table" and shopState.ok and type(shopState.Items) == "table" then
+		local canBuyFromPreview = false
+		for _, rarity in ipairs(state.buyPaperRarities) do
+			local paperKey = toInternalPaperKey(rarity)
+			local item = shopState.Items[paperKey]
+			if type(item) == "table" then
+				local remaining = tonumber(item.Remaining) or 0
+				local price = tonumber(item.Price)
+				if remaining > 0 and price and price >= 0 and getPlayerCoins() >= price then
+					canBuyFromPreview = true
+					break
+				end
+			end
+		end
+		if not canBuyFromPreview then
+			lastBuyCheck.world = worldId
+			lastBuyCheck.cycle = shopState.Cycle or currentCycle
+			lastBuyCheck.coins = getPlayerCoins()
+			return false
+		end
+	end
+
 	local standPos, npcPos, isExactNpc = findPaperSellerNPC(worldId)
 	if not standPos or not npcPos then
 		return false
 	end
 
-	if not safeTeleport(character, standPos, npcPos) then
+	if not safeTeleport(character, standPos, npcPos, 3) then
 		return false
 	end
 
@@ -2899,29 +2928,35 @@ local function performAutoBuyPhase()
 		local exactStand, exactNpc, found = findPaperSellerNPC(worldId)
 		if found and exactStand and exactNpc then
 			standPos, npcPos = exactStand, exactNpc
-			if not safeTeleport(character, standPos, npcPos) then
+			if not safeTeleport(character, standPos, npcPos, 3) then
 				return false
 			end
 		end
 	end
 
-	local okState, shopState = pcall(gameApi.BackendClient.Call, "PaperFolding", "GetShopState", worldId)
-	if not okState or type(shopState) ~= "table" or not shopState.ok or type(shopState.Items) ~= "table" then
-		clearLeash()
-		return false
-	end
-
-	local canBuyAnything = false
-	for _, rarity in ipairs(state.buyPaperRarities) do
-		local paperKey = toInternalPaperKey(rarity)
-		local item = shopState.Items[paperKey]
-		if item and (tonumber(item.Remaining) or 0) > 0 and getPlayerCoins() >= (tonumber(item.Price) or math.huge) then
-			canBuyAnything = true
-			break
+	if not (okState and type(shopState) == "table" and shopState.ok and type(shopState.Items) == "table") then
+		okState, shopState = pcall(gameApi.BackendClient.Call, "PaperFolding", "GetShopState", worldId)
+		if not okState or type(shopState) ~= "table" or not shopState.ok or type(shopState.Items) ~= "table" then
+			clearLeash()
+			return false
 		end
 	end
 
-	if not canBuyAnything then
+	local canBuyAtNpc = false
+	for _, rarity in ipairs(state.buyPaperRarities) do
+		local paperKey = toInternalPaperKey(rarity)
+		local item = shopState.Items[paperKey]
+		if type(item) == "table" then
+			local remaining = tonumber(item.Remaining) or 0
+			local price = tonumber(item.Price)
+			if remaining > 0 and price and price >= 0 and getPlayerCoins() >= price then
+				canBuyAtNpc = true
+				break
+			end
+		end
+	end
+
+	if not canBuyAtNpc then
 		lastBuyCheck.world = worldId
 		lastBuyCheck.cycle = shopState.Cycle or currentCycle
 		lastBuyCheck.coins = getPlayerCoins()
@@ -2932,13 +2967,14 @@ local function performAutoBuyPhase()
 	engageLeash(standPos, npcPos, 8)
 
 	local boughtAny = false
+	local buyFailed = false
 	for _, rarity in ipairs(state.buyPaperRarities) do
 		if not state.isRunning or not state.isAutoBuyPaperOn then
 			break
 		end
 		local paperKey = toInternalPaperKey(rarity)
 		local item = shopState.Items[paperKey]
-		while state.isRunning and state.isAutoBuyPaperOn and item and (tonumber(item.Remaining) or 0) > 0 do
+		while state.isRunning and state.isAutoBuyPaperOn and type(item) == "table" and (tonumber(item.Remaining) or 0) > 0 do
 			local price = tonumber(item.Price) or math.huge
 			if getPlayerCoins() < price then
 				break
@@ -2946,7 +2982,8 @@ local function performAutoBuyPhase()
 
 			local currentDist = Vector3.new(root.Position.X - standPos.X, 0, root.Position.Z - standPos.Z).Magnitude
 			if currentDist > 10 then
-				if not safeTeleport(character, standPos, npcPos) then
+				if not safeTeleport(character, standPos, npcPos, 3) then
+					buyFailed = true
 					break
 				end
 			end
@@ -2954,6 +2991,7 @@ local function performAutoBuyPhase()
 			local guid = hs:GenerateGUID(false)
 			local okBuy, buyRes = pcall(gameApi.BackendClient.Call, "PaperFolding", "BuyPaper", paperKey, 1, guid, shopState.Cycle)
 			if not okBuy or type(buyRes) ~= "table" then
+				buyFailed = true
 				break
 			end
 			if type(buyRes.State) == "table" and type(buyRes.State.Items) == "table" then
@@ -2969,8 +3007,12 @@ local function performAutoBuyPhase()
 				end
 				task.wait(0.2)
 			else
+				buyFailed = true
 				break
 			end
+		end
+		if buyFailed then
+			break
 		end
 	end
 
@@ -3122,11 +3164,11 @@ local function performAutoFoldPhase()
 		return false
 	end
 
-	if not safeTeleport(character, standPos, lookPos) then
+	if not safeTeleport(character, standPos, lookPos, 1.5) then
 		return false
 	end
 
-	engageLeash(standPos, lookPos, 5)
+	engageLeash(standPos, lookPos, 4)
 
 	local foldedAny = false
 	while state.isRunning and state.isAutoFoldPaperOn do
@@ -3144,8 +3186,8 @@ local function performAutoFoldPhase()
 		end
 
 		local currentDist = Vector3.new(root.Position.X - standPos.X, 0, root.Position.Z - standPos.Z).Magnitude
-		if currentDist > 7 then
-			if not safeTeleport(character, standPos, lookPos) then
+		if currentDist > 5 then
+			if not safeTeleport(character, standPos, lookPos, 1.5) then
 				break
 			end
 		end
@@ -3261,7 +3303,7 @@ local function moveToMapEgg(character, root, eggId, targetWorldId)
 				localPlayer:RequestStreamAroundAsync(mapAnchor, 3)
 			end)
 			if (root.Position - mapAnchor).Magnitude > 120 then
-				local anchorStand = groundStandPos(character, mapAnchor, mapAnchor.Y)
+				local anchorStand = groundStandPos(character, mapAnchor, mapAnchor.Y + 3)
 				root.Anchored = false
 				root.AssemblyLinearVelocity = Vector3.zero
 				character:PivotTo(CFrame.new(anchorStand))
@@ -3292,8 +3334,8 @@ local function moveToMapEgg(character, root, eggId, targetWorldId)
 	offsetDir = if offsetDir.Magnitude > 0.05 then offsetDir.Unit else Vector3.new(0, 0, 1)
 
 	local rawStand = eggPos + offsetDir * 6
-	local standPos = groundStandPos(character, rawStand, eggPos.Y)
-	if safeTeleport(character, standPos, eggPos) then
+	local standPos = groundStandPos(character, rawStand, eggPos.Y + 3)
+	if safeTeleport(character, standPos, eggPos, 3) then
 		return eggModel
 	end
 	return nil
@@ -3472,20 +3514,121 @@ end
 
 -- Main Automation Job for Auto Farm & Auto Rebirth
 local function runAutoFarmLogic(job)
-	local requestCount = 90000
+	local requestCount = 90000 -- Dummy counter cho Start
 	local lastRebirthAttempt = 0
 	local lastTrainActionTime = 0
-	
+	local isRearPauseRunning = false
+
+	local function getBestTrainingZoneId()
+		local playerRebirths = 0
+		if localPlayer:FindFirstChild("leaderstats") and localPlayer.leaderstats:FindFirstChild("Rebirths") then
+			playerRebirths = localPlayer.leaderstats.Rebirths.Value
+		end
+
+		local unlockedWorld = localPlayer:GetAttribute("UnlockedWorld") or 1
+		local bestZoneId = 1
+		local bestMult = 0
+
+		if gameApi.TrainingConfig and gameApi.TrainingConfig.Zones then
+			for id, zone in pairs(gameApi.TrainingConfig.Zones) do
+				if zone.WorldId <= unlockedWorld then
+					local isUnlocked = true
+					if zone.Premium then
+						isUnlocked = localPlayer:GetAttribute("Pass_" .. zone.PassKey) == true
+					else
+						isUnlocked = playerRebirths >= (zone.RequiredRebirths or 0)
+					end
+
+					if isUnlocked then
+						local mult = zone.TrainingMultiplier or zone.PremiumMultiplier or 0
+						if mult > bestMult then
+							bestMult = mult
+							bestZoneId = zone.Id
+						end
+					end
+				end
+			end
+		end
+
+		return bestZoneId
+	end
+
+	local function getTrainingTargetCFrame(bestZoneId)
+		if gameApi.TrainingConfig and type(gameApi.TrainingConfig.Model) == "function" then
+			local zoneModel = gameApi.TrainingConfig.Model(bestZoneId)
+			if zoneModel then
+				local targetPart = zoneModel:FindFirstChild("Region") or zoneModel:FindFirstChild("Pad")
+				if targetPart then
+					return targetPart.CFrame
+				end
+			end
+		end
+		return nil
+	end
+
+	local function performRearPauseAndReturn(originCFrame)
+		if isRearPauseRunning or not originCFrame then
+			return
+		end
+		isRearPauseRunning = true
+		lastTrainActionTime = os.clock()
+
+		local ok, err = pcall(function()
+			local character, humanoid, hrp = findAliveCharacter()
+			if not character or not humanoid or not hrp then
+				return
+			end
+
+			local rearCFrame = hrp.CFrame * CFrame.new(0, 0, 8)
+			hrp.Anchored = false
+			hrp.AssemblyLinearVelocity = Vector3.zero
+			character:PivotTo(rearCFrame)
+
+			local elapsed = 0
+			while isJobRunning(job) and state.isAutoTrainOn and elapsed < 2 do
+				local curChar, _, curHrp = findAliveCharacter()
+				if not curChar or not curHrp then
+					break
+				end
+				task.wait(0.1)
+				elapsed += 0.1
+			end
+
+			local returnChar, _, returnHrp = findAliveCharacter()
+			if state.isAutoTrainOn and returnChar and returnHrp then
+				returnHrp.Anchored = false
+				returnHrp.AssemblyLinearVelocity = Vector3.zero
+				returnChar:PivotTo(originCFrame)
+				task.wait(0.25)
+
+				local tState = localPlayer:GetAttribute("TrainingClientState")
+				if tState == "READY" and gameApi.TrainingRemote then
+					requestCount += 1
+					pcall(function()
+						gameApi.TrainingRemote:FireServer("Start", requestCount)
+					end)
+				end
+			end
+		end)
+
+		if not ok then
+			warn("Auto Training Rear Pause Failed: " .. tostring(err))
+		end
+
+		lastTrainActionTime = os.clock()
+		isRearPauseRunning = false
+	end
+
 	while isJobRunning(job) do
 		task.wait(0.5)
-		
+
 		-- AUTO REBIRTH
 		if state.isAutoRebirthOn and os.clock() - lastRebirthAttempt > 3 then
 			local canRebirth = localPlayer:GetAttribute("CanRebirth")
 			local capped = localPlayer:GetAttribute("RebirthCapped")
 			local lvl = localPlayer:GetAttribute("Level") or 0
 			local maxLvl = localPlayer:GetAttribute("MaxLevel") or 1
-			
+
 			if canRebirth and not capped and lvl >= maxLvl then
 				lastRebirthAttempt = os.clock()
 				pcall(function()
@@ -3497,54 +3640,18 @@ local function runAutoFarmLogic(job)
 				end)
 			end
 		end
-		
+
 		-- AUTO BEST TRAINING
-		if state.isAutoTrainOn and os.clock() - lastTrainActionTime > 1.5 then
-			local playerRebirths = 0
-			if localPlayer:FindFirstChild("leaderstats") and localPlayer.leaderstats:FindFirstChild("Rebirths") then
-				playerRebirths = localPlayer.leaderstats.Rebirths.Value
-			end
-			
-			local unlockedWorld = localPlayer:GetAttribute("UnlockedWorld") or 1
-			local bestZoneId = 1
-			local bestMult = 0
-			
-			if gameApi.TrainingConfig and gameApi.TrainingConfig.Zones then
-				for id, zone in pairs(gameApi.TrainingConfig.Zones) do
-					if zone.WorldId <= unlockedWorld then
-						local isUnlocked = true
-						if zone.Premium then
-							isUnlocked = localPlayer:GetAttribute("Pass_" .. zone.PassKey) == true
-						else
-							isUnlocked = playerRebirths >= (zone.RequiredRebirths or 0)
-						end
-						
-						if isUnlocked then
-							local mult = zone.TrainingMultiplier or zone.PremiumMultiplier or 0
-							if mult > bestMult then
-								bestMult = mult
-								bestZoneId = zone.Id
-							end
-						end
-					end
-				end
-			end
-			
+		if state.isAutoTrainOn and not isRearPauseRunning and os.clock() - lastTrainActionTime > 1.5 then
+			local bestZoneId = getBestTrainingZoneId()
 			local tState = localPlayer:GetAttribute("TrainingClientState")
-			local character = localPlayer.Character
-			local hrp = character and character:FindFirstChild("HumanoidRootPart")
+			local character, _, hrp = findAliveCharacter()
 			local currentZone = localPlayer:GetAttribute("TrainingZone")
-			
+
 			if hrp then
 				if tState == "OUTSIDE" or tState == "WAIT_FOR_REENTRY" or tState == nil or (currentZone ~= bestZoneId and currentZone ~= nil) then
-					local zoneModel = gameApi.TrainingConfig.Model(bestZoneId)
-					if zoneModel then
-						local targetPart = zoneModel:FindFirstChild("Region") or zoneModel:FindFirstChild("Pad")
-						if targetPart then
-							hrp.CFrame = targetPart.CFrame
-							lastTrainActionTime = os.clock()
-						end
-					end
+					local originCFrame = getTrainingTargetCFrame(bestZoneId) or hrp.CFrame
+					performRearPauseAndReturn(originCFrame)
 				elseif tState == "READY" then
 					requestCount += 1
 					pcall(function()
@@ -3643,6 +3750,7 @@ local buyRarityDropdown = MainTab:Dropdown({
 	Flag = "BuyPaperRarities",
 	Callback = function(v)
 		state.buyPaperRarities = type(v) == "table" and v or {}
+		lastBuyCheck.world = nil
 	end
 })
 state.buyPaperRarities = buyRarityDropdown:Get()
@@ -3700,7 +3808,6 @@ local eggSelectDropdown
 local eggStatusLabel
 
 local function resolveEggIdForCurrentMap(eggName, mapId)
-	local visibleOptions = getEggOptionsForMap(getMapNameById(mapId))
 	for _, eggId in ipairs(eggCatalog.Order) do
 		local info = eggCatalog.ById[eggId]
 		if info and info.Name == eggName and (info.World == mapId or info.Event) then
@@ -3938,4 +4045,3 @@ task.spawn(function()
 	
 	W:Notify({Title = "Bakhi Hub", Text = "All Features Loaded Successfully!", Time = 4})
 end)
-
