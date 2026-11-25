@@ -1,6 +1,6 @@
 -- ==============================================================================
 -- BAKHI HUB - FULL ANIMATION VERSION (HIDDEN BOOT) + MULTI-LANGUAGE
--- THROW FOOD FOR ANIMALS V1.2 (FIXED AUTO BUY & EQUIP FOOD)
+-- THROW FOOD FOR ANIMALS V1.5 (THANKSGIVING AUTO COOK + SELECT FOOD + FIXED AUTO BUY FOOD)
 -- ==============================================================================
 
 local Players = game:GetService("Players")
@@ -24,10 +24,12 @@ local Langs = {
 		StatusInvalid = "Invalid key! Click GET KEY to obtain one.", StatusExpired = "This key has expired! Click GET KEY for a new one.",
 		StatusEmpty = "Please enter a key first!", StatusSuccess = "Key verified successfully!", BtnSubmit = "SUBMIT KEY", BtnChecking = "CHECKING...",
 		BtnSuccess = "SUCCESS", BtnExpired = "EXPIRED", BtnRetry = "RETRY", BtnGetKey = "GET KEY", BtnDiscord = "JOIN DISCORD", Placeholder = "Paste BAKHI-XXXX key here...",
-		MainTab = "Main", EventTab = "Event", SettingsTab = "Settings", ThrowSec = "Throw", AutoThrow = "Auto Throw", TrainSec = "Training", AutoTrain = "Auto Training",
+		MainTab = "Main", EventTab = "Event", SettingsTab = "Settings", ThrowSec = "Throw", AutoThrow = "Auto Throw", SelectFood = "Select Food",
+		TrainSec = "Training", AutoTrain = "Auto Training",
 		AutoUpStand = "Auto Upgrade Stand", PetSec = "Auto Sell", AutoSellPets = "Auto Sell Pets", FilterRarities = "Filter Sell Rarities", FilterMutations = "Filter Sell Mutations",
-		PlotSec = "Plot & Shop", AutoUpFence = "Auto Upgrade Fence", AutoBuyFood = "Auto Buy Food", AutoEquipBest = "Auto Equip Best", RingRushSec = "Ring Rush Event",
-		AutoRingRush = "Auto Ring Rush", MaxRings = "Max Rings Per Run", StatusEventActive = "Status: ACTIVE", StatusEventWait = "Status: Waiting for Event...",
+		PlotSec = "Plot & Shop", AutoUpFence = "Auto Upgrade Fence", AutoBuyFood = "Auto Buy Food", AutoEquipBest = "Auto Equip Best",
+		ThanksgivingSec = "Thanksgiving Feast", AutoCook = "Auto Cook", SelectSandwiches = "Select Sandwiches",
+		NextFeast = "Next Feast (UTC+7)", FeastIngredients = "Ingredients",
 		OfflineSec = "Offline Rewards", ClaimWelcome = "Claim Welcome Back", InterfaceSec = "Interface", Effects = "UI Effects", GlassDensity = "Glass Density",
 		UtilSec = "Utility", AntiAFK = "Anti AFK", TroubleSec = "Troubleshooting", FixMovement = "Fix Movement (Unstuck)", LangSec = "Language", SelectLang = "Select Language",
 		NotifLoaded = "Loaded successfully! Have fun!", NotifClaimed = "Auto claimed Offline Earnings!", NotifFix = "Movement and camera locks removed!", NotifLangSaved = "Language updated successfully!"
@@ -38,10 +40,12 @@ local Langs = {
 		StatusInvalid = "Key không hợp lệ! Bấm LẤY KEY để nhận.", StatusExpired = "Key này đã hết hạn! Bấm LẤY KEY để nhận mới.",
 		StatusEmpty = "Vui lòng nhập key trước!", StatusSuccess = "Xác thực thành công!", BtnSubmit = "XÁC NHẬN", BtnChecking = "ĐANG XỬ LÝ...",
 		BtnSuccess = "THÀNH CÔNG", BtnExpired = "HẾT HẠN", BtnRetry = "THỬ LẠI", BtnGetKey = "LẤY KEY", BtnDiscord = "THAM GIA DISCORD", Placeholder = "Dán mã key BAKHI-XXXX vào đây...",
-		MainTab = "Chức Năng", EventTab = "Sự Kiện", SettingsTab = "Cài Đặt", ThrowSec = "Ném", AutoThrow = "Tự Động Ném", TrainSec = "Huấn Luyện", AutoTrain = "Tự Động Tập Luyện",
+		MainTab = "Chức Năng", EventTab = "Sự Kiện", SettingsTab = "Cài Đặt", ThrowSec = "Ném", AutoThrow = "Tự Động Ném", SelectFood = "Chọn Loại Thức Ăn",
+		TrainSec = "Huấn Luyện", AutoTrain = "Tự Động Tập Luyện",
 		AutoUpStand = "Tự Nâng Cấp Xà", PetSec = "Tự Động Bán", AutoSellPets = "Tự Động Bán Thú", FilterRarities = "Lọc Độ Hiếm Bán", FilterMutations = "Lọc Đột Biến Bán",
-		PlotSec = "Đất & Cửa Hàng", AutoUpFence = "Tự Nâng Cấp Rào", AutoBuyFood = "Tự Mua Thức Ăn", AutoEquipBest = "Tự Trang Bị Tốt Nhất", RingRushSec = "Sự kiện Vượt Vòng",
-		AutoRingRush = "Tự Động Vượt Vòng", MaxRings = "Số Vòng Tối Đa Mỗi Chuyến", StatusEventActive = "Trạng thái: ĐANG MỞ", StatusEventWait = "Trạng thái: Đang chờ sự kiện...",
+		PlotSec = "Đất & Cửa Hàng", AutoUpFence = "Tự Nâng Cấp Rào", AutoBuyFood = "Tự Mua Thức Ăn", AutoEquipBest = "Tự Trang Bị Tốt Nhất",
+		ThanksgivingSec = "Lễ Tạ Ơn (Feast)", AutoCook = "Tự Động Nấu", SelectSandwiches = "Chọn Loại Bánh",
+		NextFeast = "Sự kiện tiếp theo (UTC+7)", FeastIngredients = "Nguyên liệu",
 		OfflineSec = "Quà Rời Mạng", ClaimWelcome = "Nhận Quà Chào Mừng", InterfaceSec = "Giao Diện UI", Effects = "Mức Độ Hiệu Ứng", GlassDensity = "Độ Mờ Kính (Nền)",
 		UtilSec = "Tiện Ích", AntiAFK = "Chống Kích Hoạt Động (Anti AFK)", TroubleSec = "Sửa Lỗi", FixMovement = "Sửa Lỗi Kẹt Di Chuyển", LangSec = "Ngôn Ngữ", SelectLang = "Chọn Ngôn Ngữ",
 		NotifLoaded = "Tải thành công! Chúc chơi vui vẻ!", NotifClaimed = "Đã tự động nhận tiền Offline!", NotifFix = "Đã xóa khóa góc nhìn và di chuyển!", NotifLangSaved = "Chuyển đổi ngôn ngữ thành công!"
@@ -114,6 +118,7 @@ local function loadMainScript()
 	local EquipBestRemote = RemotesFolder:WaitForChild("Plot_EquipBest")
 	
 	local DynamicUITexts = {}
+	local onLanguageUpdated = nil
 	local function RegT(uiObj, langKey, elemType) table.insert(DynamicUITexts, {obj = uiObj, key = langKey, type = elemType}) end
 	local function UpdateAllLanguageTexts()
 		for _, item in ipairs(DynamicUITexts) do
@@ -122,6 +127,7 @@ local function loadMainScript()
 			elseif item.type == "Section" and item.obj and item.obj.Label then item.obj.Label.Text = string.upper(newText)
 			elseif item.type == "Normal" and item.obj and item.obj.Label then item.obj.Label.Text = newText end
 		end
+		if onLanguageUpdated then pcall(onLanguageUpdated) end
 	end
 
 	local ps, uis, tws, gs, hs = game:GetService("Players"), game:GetService("UserInputService"), game:GetService("TweenService"), game:GetService("GuiService"), game:GetService("HttpService")
@@ -962,7 +968,7 @@ local function loadMainScript()
 		return W
 	end
 
-	local W = L:Window({Title = T("Title"), Subtitle = "Throw Food For Animals V1.2", Config = `Setting_{LocalPlayer.Name}`})
+	local W = L:Window({Title = T("Title"), Subtitle = "Throw Food For Animals V1.5", Config = `Setting_{LocalPlayer.Name}`})
 	local tabMain = W:Tab({Name = T("MainTab")})
 	RegT(tabMain, "MainTab", "Tab")
 	local tabEvent = W:Tab({Name = T("EventTab")})
@@ -1027,21 +1033,53 @@ local function loadMainScript()
 	local TrainingController = TrainingModule and safeRequire(TrainingModule)
 	local ClientStateModule = safeRequire(findController("ClientState"))
 	local DataController = safeRequire(findController("DataController"))
-	local RingRushFlight = safeRequire(findController("RingRushFlight"))
 
 	local FoodsConfig = safeRequire(ReplicatedStorage:WaitForChild("Config"):WaitForChild("FoodsConfig"))
 	local StandsConfig = safeRequire(ReplicatedStorage:WaitForChild("Config"):WaitForChild("StandsConfig"))
 	local FenceConfig = safeRequire(ReplicatedStorage:WaitForChild("Config"):WaitForChild("FenceConfig"))
 	local AnimalEconomy = safeRequire(ReplicatedStorage:WaitForChild("Config"):WaitForChild("AnimalEconomy"))
 	local RarityConfig = safeRequire(ReplicatedStorage:WaitForChild("Config"):WaitForChild("RarityConfig"))
-	local RingRushConfig = safeRequire(ReplicatedStorage:WaitForChild("Config"):FindFirstChild("RingRushConfig"))
-	local RingRushCourse = safeRequire(ReplicatedStorage:WaitForChild("Shared"):FindFirstChild("RingRushCourse"))
+	local ThanksgivingConfig = safeRequire(ReplicatedStorage:WaitForChild("Config"):FindFirstChild("ThanksgivingConfig"))
+	local ThanksgivingShared = safeRequire(ReplicatedStorage:WaitForChild("Shared"):FindFirstChild("Thanksgiving"))
+
+	local FoodNameList = {}
+	local FoodIndexByName = {}
+	local function buildFoodOptions()
+		table.clear(FoodNameList)
+		table.clear(FoodIndexByName)
+		if FoodsConfig then
+			local sourceList = (type(FoodsConfig.List) == "table" and #FoodsConfig.List > 0 and FoodsConfig.List) or FoodsConfig.All
+			if type(sourceList) == "table" then
+				for idx, food in ipairs(sourceList) do
+					if type(food) == "table" and type(food.Name) == "string" then
+						local foodIdx = food.Index or idx
+						table.insert(FoodNameList, food.Name)
+						FoodIndexByName[food.Name] = foodIdx
+					end
+				end
+			end
+		end
+		if #FoodNameList == 0 then
+			table.insert(FoodNameList, "Carrot")
+			FoodIndexByName["Carrot"] = 1
+		end
+	end
+	buildFoodOptions()
 
 	local RarityList = {"Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic", "Secret", "Divine", "Celestial", "Eternal", "Cosmic", "Supreme"}
 	local MutationList = {"None", "Gold", "Diamond", "Emerald", "Ruby", "Rainbow", "Champion"}
+	local SandwichOrderList = {"Regular", "Big", "Mega"}
 
-	local configState = {AutoThrow = false, AutoTrain = false, AutoUpgradeStand = false, AutoUpgradeFence = false, AutoBuyFood = false, AutoSellPet = false, SellRarities = {"Common", "Uncommon"}, SellMutations = {"None"}, AutoEquip = false, AutoRingRush = false, MaxRingsPerRun = 150, AntiAFK = true, Running = true}
+	local configState = {
+		AutoThrow = false, SelectedFoods = {}, AutoTrain = false, AutoUpgradeStand = false, AutoUpgradeFence = false,
+		AutoBuyFood = false, AutoSellPet = false, SellRarities = {"Common", "Uncommon"},
+		SellMutations = {"None"}, AutoEquip = false,
+		AutoCook = false, CookOrders = {"Mega", "Big", "Regular"},
+		AntiAFK = true, Running = true
+	}
 	local busy = { action = false }
+	local foodCycleIdx = 0
+	local cookState = { inFlight = false, lastCall = 0, cooldown = 1.15, lastTalkCall = 0 }
 
 	LocalPlayer.Idled:Connect(function()
 		if configState.AntiAFK then
@@ -1085,6 +1123,14 @@ local function loadMainScript()
 	RegT(secThrow, "ThrowSec", "Section")
 	local togThrow = tabMain:Toggle({Name = T("AutoThrow"), Default = false, Flag = "AutoThrow", Callback = function(v) configState.AutoThrow = v if not v then resetMovementLock() end end})
 	RegT(togThrow, "AutoThrow", "Normal")
+	local ddSelectFood = tabMain:Dropdown({
+		Name = T("SelectFood"), Options = FoodNameList, Multi = true, Default = {}, Flag = "SelectedFoods",
+		Callback = function(v)
+			configState.SelectedFoods = v or {}
+			foodCycleIdx = 0
+		end
+	})
+	RegT(ddSelectFood, "SelectFood", "Normal")
 
 	local secTrain = tabMain:Section({Name = T("TrainSec")})
 	RegT(secTrain, "TrainSec", "Section")
@@ -1111,13 +1157,35 @@ local function loadMainScript()
 	local togEquipBest = tabMain:Toggle({Name = T("AutoEquipBest"), Default = false, Flag = "AutoEquip", Callback = function(v) configState.AutoEquip = v end})
 	RegT(togEquipBest, "AutoEquipBest", "Normal")
 
-	local secRingRush = tabEvent:Section({Name = T("RingRushSec")})
-	RegT(secRingRush, "RingRushSec", "Section")
-	local eventStatusLabel = tabEvent:Label({ Text = T("StatusEventWait") })
-	local togRingRush = tabEvent:Toggle({Name = T("AutoRingRush"), Default = false, Flag = "AutoRingRush", Callback = function(v) configState.AutoRingRush = v if not v then resetMovementLock() end end})
-	RegT(togRingRush, "AutoRingRush", "Normal")
-	local sldMaxRings = tabEvent:Slider({Name = T("MaxRings"), Min = 20, Max = 300, Step = 10, Default = 150, Flag = "MaxRingsPerRun", Callback = function(v) configState.MaxRingsPerRun = v end})
-	RegT(sldMaxRings, "MaxRings", "Normal")
+	-- [[ UI - EVENT TAB (THANKSGIVING FEAST AUTO COOK & COUNTDOWN) ]] --
+	local function getVietnamNextFeastCountdown()
+		local nowUtc = DateTime.now().UnixTimestamp
+		local vnTime = nowUtc + 7 * 3600
+		local vnDate = os.date("!*t", vnTime)
+		local secInHour = vnDate.min * 60 + vnDate.sec
+		local remaining = (secInHour < 1800) and (1800 - secInHour) or (3600 - secInHour)
+		local hrs = math.floor(remaining / 3600)
+		local mins = math.floor((remaining % 3600) / 60)
+		local secs = remaining % 60
+		return string.format("%02d:%02d:%02d", hrs, mins, secs)
+	end
+
+	local secThanksgiving = tabEvent:Section({Name = T("ThanksgivingSec")})
+	RegT(secThanksgiving, "ThanksgivingSec", "Section")
+	local feastStatusLabel = tabEvent:Label({ Text = T("NextFeast") .. ": " .. getVietnamNextFeastCountdown() .. " | " .. T("FeastIngredients") .. ": 0" })
+	local togAutoCook = tabEvent:Toggle({
+		Name = T("AutoCook"), Default = false, Flag = "AutoCook",
+		Callback = function(v)
+			configState.AutoCook = v
+			if v then cookState.cooldown = 1.15 end
+		end
+	})
+	RegT(togAutoCook, "AutoCook", "Normal")
+	local ddCookTypes = tabEvent:Dropdown({
+		Name = T("SelectSandwiches"), Options = SandwichOrderList, Multi = true, Default = {"Mega", "Big", "Regular"}, Flag = "CookOrders",
+		Callback = function(v) configState.CookOrders = v or {} end
+	})
+	RegT(ddCookTypes, "SelectSandwiches", "Normal")
 
 	local secUtil = tabSettings:Section({Name = T("UtilSec")})
 	RegT(secUtil, "UtilSec", "Section")
@@ -1186,71 +1254,181 @@ local function loadMainScript()
 		return "Common"
 	end
 
-	local function isRingRushActive()
-		if RingRushFlight and type(RingRushFlight.GetIsActive) == "function" then
-			local ok, res = pcall(RingRushFlight.GetIsActive)
+	local function equipSelectedFoodForThrow()
+		if not configState.SelectedFoods or #configState.SelectedFoods == 0 then return end
+		local dataCtrl = DataController or safeRequire(findController("DataController"))
+		if not dataCtrl then return end
+
+		local ownedSelected = {}
+		for _, foodName in ipairs(configState.SelectedFoods) do
+			local idx = FoodIndexByName[foodName]
+			if idx then
+				local isOwned = (idx == 1)
+				if not isOwned then
+					pcall(function() isOwned = (dataCtrl:GetPath("OwnedFoods." .. idx) == true) end)
+				end
+				if isOwned then
+					table.insert(ownedSelected, idx)
+				end
+			end
+		end
+
+		if #ownedSelected == 0 then return end
+		foodCycleIdx = (foodCycleIdx % #ownedSelected) + 1
+		local targetFoodIdx = ownedSelected[foodCycleIdx]
+
+		local currentlyEquipped = 1
+		pcall(function() currentlyEquipped = dataCtrl:Get("EquippedFood") or 1 end)
+		if currentlyEquipped ~= targetFoodIdx then
+			pcall(function() RemotesModule.Invoke("Shop_Equip", targetFoodIdx) end)
+		end
+	end
+
+	-- [[ THANKSGIVING FEAST HELPERS ]] --
+	local function getThanksgivingData(dataCtrl)
+		local ctrl = dataCtrl or DataController or safeRequire(findController("DataController"))
+		if not ctrl then return {} end
+		local raw = nil
+		pcall(function() raw = ctrl:Get("Thanksgiving") end)
+		return type(raw) == "table" and raw or {}
+	end
+
+	local function getTotalIngredients(tgData)
+		if ThanksgivingShared and type(ThanksgivingShared.TotalIngredients) == "function" then
+			local ok, total = pcall(ThanksgivingShared.TotalIngredients, tgData)
+			if ok and type(total) == "number" then return total end
+		end
+		local ing = type(tgData.Ingredients) == "table" and tgData.Ingredients or {}
+		local sp = math.max(0, math.floor(tonumber(ing.SweetPotato) or 0))
+		local cs = math.max(0, math.floor(tonumber(ing.CranberrySauce) or 0))
+		local cb = math.max(0, math.floor(tonumber(ing.Cornbread) or 0))
+		return sp + cs + cb
+	end
+
+	local function getRequiredIngredients(orderKey)
+		if ThanksgivingConfig and type(ThanksgivingConfig.Order) == "function" then
+			local ok, ord = pcall(ThanksgivingConfig.Order, orderKey)
+			if ok and type(ord) == "table" and type(ord.Ingredients) == "number" then
+				return ord.Ingredients
+			end
+		end
+		local fallback = { Regular = 3, Big = 6, Mega = 9 }
+		return fallback[orderKey]
+	end
+
+	local function canCookOrder(tgData, orderKey)
+		local req = getRequiredIngredients(orderKey)
+		if not req then return false end
+		if ThanksgivingShared and type(ThanksgivingShared.CanCook) == "function" then
+			local ok, res = pcall(ThanksgivingShared.CanCook, tgData, orderKey)
 			if ok then return res == true end
 		end
-		local evName = RingRushConfig and RingRushConfig.EventName or "RingRush"
-		local stage = workspace:GetAttribute("LiveEventStage_" .. evName)
-		if workspace:GetAttribute("LiveEvent_" .. evName) ~= nil and RingRushConfig and RingRushConfig.FlightStages then
-			return RingRushConfig.FlightStages[stage] == true
-		end
-		return false
+		return getTotalIngredients(tgData) >= req
 	end
+
+	local function isThanksgivingOpen()
+		local eligible = true
+		if ThanksgivingShared and type(ThanksgivingShared.IsEligible) == "function" then
+			local ok, res = pcall(ThanksgivingShared.IsEligible, LocalPlayer)
+			if ok then eligible = (res == true) end
+		end
+		if not eligible then return false end
+		if ThanksgivingShared and type(ThanksgivingShared.State) == "function" then
+			local ok, st = pcall(ThanksgivingShared.State)
+			if ok and type(st) == "table" then return st.Open == true end
+		end
+		return workspace:FindFirstChild("ThanksgivingPicnic") ~= nil
+	end
+
+	local function getThanksgivingChefPosition()
+		local picnic = workspace:FindFirstChild("ThanksgivingPicnic")
+		if not picnic then return nil end
+		local promptAnchor = picnic:FindFirstChild("OpenPromptAnchor", true)
+		if promptAnchor and promptAnchor:IsA("BasePart") then
+			return promptAnchor.Position + Vector3.new(0, 3, 0)
+		end
+		local chef = picnic:FindFirstChild("TurkeyChef")
+		if chef then
+			local part = chef.PrimaryPart or chef:FindFirstChild("Head") or chef:FindFirstChildWhichIsA("BasePart")
+			if part then return part.Position + Vector3.new(0, 3, 3) end
+		end
+		return nil
+	end
+
+	local function updateFeastCountdownLabel()
+		local tgData = getThanksgivingData()
+		local totalIng = getTotalIngredients(tgData)
+		local countdown = getVietnamNextFeastCountdown()
+		feastStatusLabel:Set(T("NextFeast") .. ": " .. countdown .. " | " .. T("FeastIngredients") .. ": " .. tostring(totalIng))
+	end
+
+	onLanguageUpdated = updateFeastCountdownLabel
+	pcall(updateFeastCountdownLabel)
 
 	task.spawn(function()
 		while task.wait(1) do
 			if not configState.Running then break end
-			pcall(function()
-				local evName = RingRushConfig and RingRushConfig.EventName or "RingRush"
-				local stage = workspace:GetAttribute("LiveEventStage_" .. evName)
-				if isRingRushActive() then eventStatusLabel:Set(T("StatusEventActive") .. " (" .. tostring(stage or "Flight") .. ")")
-				else eventStatusLabel:Set(T("StatusEventWait")) end
-			end)
+			pcall(updateFeastCountdownLabel)
 		end
 	end)
 
-	local function executeRingRushRun(character, clientState)
-		if not RingRushCourse then return false end
-		local launchPos = getBestLaunchPosition() or Vector3.zero
-		if character and launchPos ~= Vector3.zero then
-			safeTeleport(character, launchPos)
-			local hrp = character:FindFirstChild("HumanoidRootPart")
-			if hrp then hrp.Anchored = true end
+	local function tryAutoCookThanksgiving()
+		if not configState.AutoCook or cookState.inFlight then return end
+		if not configState.CookOrders or #configState.CookOrders == 0 then return end
+		if os.clock() - cookState.lastCall < cookState.cooldown then return end
+		if not isThanksgivingOpen() then return end
+
+		local dataCtrl = DataController or safeRequire(findController("DataController"))
+		if not dataCtrl then return end
+		local tgData = getThanksgivingData(dataCtrl)
+
+		local selectedOrder = nil
+		for _, orderKey in ipairs({ "Mega", "Big", "Regular" }) do
+			if table.find(configState.CookOrders, orderKey) and canCookOrder(tgData, orderKey) then
+				selectedOrder = orderKey
+				break
+			end
 		end
 
-		local startThrow = RemotesModule.Invoke("Throw_Start")
-		local beginRes = RemotesModule.Invoke("RingRush_Begin")
-		if not (beginRes and beginRes.Ok) then
-			if startThrow and startThrow.Ok then RemotesModule.Invoke("Throw_Cancel") end
-			local hrp = character and character:FindFirstChild("HumanoidRootPart")
-			if hrp then hrp.Anchored = false end
-			return false
-		end
+		if not selectedOrder then return end
 
-		local course = RingRushCourse.new(beginRes.Seed, launchPos)
-		local prevDist, passes, misses, elapsed = 0, 0, 0, 0
+		cookState.inFlight = true
+		cookState.lastCall = os.clock()
 
-		for ringIdx = 1, configState.MaxRingsPerRun do
-			if not configState.Running or not configState.AutoRingRush or not isRingRushActive() then break end
-			local ring = course:GetRing(ringIdx)
-			local speed = RingRushCourse.GetSpeed(passes, misses)
-			local dt = (ring.Distance - prevDist) / speed + 0.025
-			task.wait(dt)
-			elapsed = elapsed + dt
-			local targetOffset = course:GetRingOffset(ring, elapsed)
-			local rep = RemotesModule.Invoke("RingRush_Report", ringIdx, true, targetOffset.X, targetOffset.Y, elapsed)
-			passes = passes + 1
-			prevDist = ring.Distance
-			if not rep or not rep.Ok or rep.Ended then break end
-		end
+		task.spawn(function()
+			local ok, res = pcall(function()
+				if tgData.Talked ~= true and (os.clock() - cookState.lastTalkCall >= 5) then
+					cookState.lastTalkCall = os.clock()
+					RemotesModule.Invoke("Thanksgiving_Action", "Talked")
+					task.wait(0.25)
+				end
+				return RemotesModule.Invoke("Thanksgiving_Action", "Cook", selectedOrder)
+			end)
 
-		pcall(function() RemotesModule.Invoke("RingRush_End") end)
-		pcall(function() RemotesModule.Invoke("Throw_Cancel") end)
-		local hrp = character and character:FindFirstChild("HumanoidRootPart")
-		if hrp then hrp.Anchored = false end
-		return true
+			if ok and type(res) == "table" and res.Ok == true then
+				cookState.cooldown = 1.15
+			else
+				local reason = (ok and type(res) == "table" and tostring(res.Reason or "")) or "Error"
+				if reason == "TooFar" then
+					cookState.cooldown = 1.5
+					if not busy.action and not configState.AutoThrow and not configState.AutoTrain then
+						local chefPos = getThanksgivingChefPosition()
+						local char = LocalPlayer.Character
+						if char and chefPos then
+							safeTeleport(char, chefPos)
+						end
+					end
+				elseif reason == "TooFast" or reason == "Error" or reason == "BadResponse" then
+					cookState.cooldown = 2.5
+				elseif reason == "Closed" or reason == "NotEnough" then
+					cookState.cooldown = 2.0
+				else
+					cookState.cooldown = 2.0
+				end
+			end
+
+			cookState.inFlight = false
+		end)
 	end
 
 	LocalPlayer:WaitForChild("PlayerGui").DescendantAdded:Connect(function(descendant)
@@ -1398,8 +1576,12 @@ local function loadMainScript()
 			local clientState = ClientStateModule or safeRequire(findController("ClientState"))
 			local character = LocalPlayer.Character
 
-			if not configState.AutoThrow and not configState.AutoTrain and not configState.AutoRingRush then
+			if not configState.AutoThrow and not configState.AutoTrain then
 				if not busy.action then resetMovementLock() end
+			end
+
+			if configState.AutoCook then
+				pcall(tryAutoCookThanksgiving)
 			end
 
 			if not busy.action then
@@ -1408,21 +1590,10 @@ local function loadMainScript()
 			end
 
 			if not busy.action and clientState and not clientState.OfflineOpen then
-				if configState.AutoRingRush and isRingRushActive() then
-					if clientState.Busy == "Training" and TrainingController and type(TrainingController.Stop) == "function" then
-						pcall(TrainingController.Stop, true)
-						task.wait(0.2)
-					end
+				if configState.AutoThrow then
 					busy.action = true
 					clientState.Busy = "Throw"
-					pcall(executeRingRushRun, character, clientState)
-					clientState.Busy = nil
-					busy.action = false
-					task.wait(1)
-
-				elseif configState.AutoThrow then
-					busy.action = true
-					clientState.Busy = "Throw"
+					equipSelectedFoodForThrow()
 					local launchPos = getBestLaunchPosition()
 					local hrp = character and character:FindFirstChild("HumanoidRootPart")
 					if character and launchPos then safeTeleport(character, launchPos) if hrp then hrp.Anchored = true end end
